@@ -16,9 +16,9 @@ The GitHub repository is [jobayermannan/food-intelligence-platform](https://gith
 
 ## Local development
 
-Use Node.js 24 and npm. Copy `.env.example` to `.env`, replace `JWT_SECRET` with a unique random value of at least 32 bytes, and keep `.env` untracked. For a fully containerized setup, run `docker compose up --build`. The API listens on port 3000, PostgreSQL on 5432, and the development email sink at `http://localhost:8025`. Compose runs migrations before API startup. The example database password is for local development only.
+Use Node.js 24 and npm. Copy `.env.example` to `.env`, replace `JWT_SECRET` with a unique random value of at least 32 bytes, and keep `.env` untracked. For a fully containerized setup, run `docker compose up --build`. The API listens on port 3000, PostgreSQL on host port 5434 (container port 5432), and the development email sink at `http://localhost:8025`. Compose runs migrations before API startup. The example database password is for local development only.
 
-For a host-run API with containerized dependencies, start `docker compose up postgres mailpit`, run `npm ci`, `npm run db:migrate`, then `npm run dev`. Set `SMTP_HOST=localhost` and `DATABASE_URL=postgres://food:food_dev_only@localhost:5432/food_intelligence` in the host process or `.env`. Readiness is `GET /health/ready`; liveness is `GET /health/live`. OpenAPI UI is `/api/docs`.
+For a host-run API with containerized dependencies, start `docker compose up postgres mailpit`, run `npm ci`, `npm run db:migrate`, then `npm run dev`. Set `SMTP_HOST=localhost` and `DATABASE_URL=postgres://food:food_dev_only@localhost:5434/food_intelligence` in the host process or `.env`. Readiness is `GET /health/ready`; liveness is `GET /health/live`. OpenAPI UI is `/api/docs`.
 
 The verification email contains a single-use token for `POST /api/v1/auth/verify-email`. Access tokens belong in memory; the server sets the HttpOnly refresh cookie. Refresh/logout require an `Origin` equal to `APP_ORIGIN`. For local HTTP only, set `COOKIE_SECURE=false`; keep secure cookies enabled for HTTPS deployment.
 
