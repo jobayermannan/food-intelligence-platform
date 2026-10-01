@@ -132,17 +132,46 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
       .get(`${base}/auth/me`)
       .set(bearer(fresh.body.accessToken as string))
       .expect(401);
+    const beforeReset = await request(app.getHttpServer())
+      .post(`${base}/auth/login`)
+      .send({ email: "auth-test@example.test", password })
+      .expect(200);
     await request(app.getHttpServer())
       .post(`${base}/auth/forgot-password`)
       .send({ email: "auth-test@example.test" })
       .expect(202);
+    const resetToken = tokenFromMail();
     await request(app.getHttpServer())
       .post(`${base}/auth/reset-password`)
-      .send({ token: tokenFromMail(), password: "NewStrongPassword!2026" })
+      .send({ token: resetToken, password: "NewStrongPassword!2026" })
       .expect(204);
+    await request(app.getHttpServer())
+      .post(`${base}/auth/reset-password`)
+      .send({ token: resetToken, password: "AnotherStrongPassword!2026" })
+      .expect(400);
+    await request(app.getHttpServer())
+      .get(`${base}/auth/me`)
+      .set(bearer(beforeReset.body.accessToken as string))
+      .expect(401);
     await request(app.getHttpServer())
       .post(`${base}/auth/login`)
       .send({ email: "auth-test@example.test", password })
+      .expect(401);
+    const afterReset = await request(app.getHttpServer())
+      .post(`${base}/auth/login`)
+      .send({
+        email: "auth-test@example.test",
+        password: "NewStrongPassword!2026",
+      })
+      .expect(200);
+    await request(app.getHttpServer())
+      .post(`${base}/auth/logout`)
+      .set("Origin", "http://localhost:3000")
+      .set(bearer(afterReset.body.accessToken as string))
+      .expect(204);
+    await request(app.getHttpServer())
+      .get(`${base}/auth/me`)
+      .set(bearer(afterReset.body.accessToken as string))
       .expect(401);
   });
 
@@ -505,6 +534,43 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
       })
       .expect(201);
     expect(discountedReturn.body.totalAmount).toBe("7.700000");
+    const repeatedReturn = await server
+      .post(
+        `${base}/businesses/${businessA}/orders/${discountedOrder.body.id}/returns`,
+      )
+      .set(bearer(a.access))
+      .send({
+        reason: "Unsaleable customer return",
+        lines: [
+          {
+            allocationId: discountedAllocation.id,
+            quantity: "1",
+            restocked: "0",
+            disposed: "1",
+          },
+        ],
+        requestKey: "discounted-return-2026",
+      })
+      .expect(201);
+    expect(repeatedReturn.body.id).toBe(discountedReturn.body.id);
+    await server
+      .post(
+        `${base}/businesses/${businessA}/orders/${discountedOrder.body.id}/returns`,
+      )
+      .set(bearer(a.access))
+      .send({
+        reason: "Repeated quantity",
+        lines: [
+          {
+            allocationId: discountedAllocation.id,
+            quantity: "1",
+            restocked: "1",
+            disposed: "0",
+          },
+        ],
+        requestKey: "discounted-return-again",
+      })
+      .expect(409);
     expect(
       (
         await database.db
@@ -536,6 +602,57 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
         operationKey: "receive-highcost-2026",
       })
       .expect(201);
+    const day = (offset: number) =>
+      new Date(Date.parse(`${today}T00:00:00Z`) + offset * 86400000)
+        .toISOString()
+        .slice(0, 10);
+    const warningBatch = (
+      await server
+        .post(`${stockUrl}/purchases`)
+        .set(bearer(a.access))
+        .send({
+          locationId: loc1,
+          productId: product,
+          quantity: "1",
+          unit: "piece",
+          acquisitionTotal: "1",
+          expiryStatus: "known",
+          expiresOn: day(2),
+          operationKey: "warning-receipt-2026",
+        })
+        .expect(201)
+    ).body.id as string;
+    const expiredBatch = (
+      await server
+        .post(`${stockUrl}/purchases`)
+        .set(bearer(a.access))
+        .send({
+          locationId: loc1,
+          productId: product,
+          quantity: "1",
+          unit: "piece",
+          acquisitionTotal: "1",
+          expiryStatus: "known",
+          expiresOn: day(-1),
+          operationKey: "expired-receipt-2026",
+        })
+        .expect(201)
+    ).body.id as string;
+    const states = (
+      await server
+        .get(
+          `${base}/businesses/${businessA}/inventory/expiry?locationId=${loc1}`,
+        )
+        .set(bearer(a.access))
+        .expect(200)
+    ).body as { batch: { id: string }; classification: string }[];
+    expect(
+      states.find((row) => row.batch.id === warningBatch)?.classification,
+    ).toBe("WARNING");
+    expect(
+      states.find((row) => row.batch.id === expiredBatch)?.classification,
+    ).toBe("EXPIRED");
+    expect(states.some((row) => row.classification === "UNKNOWN")).toBe(true);
     await server
       .post(`${base}/businesses/${businessA}/discounts`)
       .set(bearer(a.access))
@@ -556,6 +673,39 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
         quantity: "1",
         reason: "spoiled",
         operationKey: "cross-tenant-0001",
+      })
+      .expect(404);
+    await server
+      .post(`${base}/businesses/${businessB}/inventory/transfers`)
+      .set(bearer(a.access))
+      .send({
+        sourceLocationId: loc1,
+        destinationLocationId: loc2,
+        batchId: late,
+        quantity: "1",
+        operationKey: "cross-tenant-transfer",
+      })
+      .expect(404);
+    await server
+      .post(`${base}/businesses/${businessA}/waste`)
+      .set(bearer(a.access))
+      .send({
+        locationId: loc1,
+        batchId: late,
+        quantity: "0",
+        reason: "spoiled",
+        operationKey: "zero-waste-2026",
+      })
+      .expect(400);
+    await server
+      .post(`${base}/businesses/${businessA}/waste`)
+      .set(bearer(a.access))
+      .send({
+        locationId: loc2,
+        batchId: late,
+        quantity: "1",
+        reason: "spoiled",
+        operationKey: "wrong-location-waste",
       })
       .expect(404);
     expect(
@@ -683,6 +833,15 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
       .set(bearer(staff.access))
       .expect(404);
     await server
+      .post(`${base}/businesses/${businessId}/orders`)
+      .set(bearer(staff.access))
+      .send({
+        locationId: locationB,
+        lines: [{ productId: locationA, quantity: "1" }],
+        requestKey: "staff-unauthorized-sale",
+      })
+      .expect(404);
+    await server
       .post(`${base}/businesses/${businessId}/locations`)
       .set(bearer(staff.access))
       .send({ code: "C", name: "C" })
@@ -719,6 +878,29 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
       .set(bearer(owner.access))
       .send({ password })
       .expect(409);
+    await server
+      .patch(`${base}/businesses/${businessId}/members/${staffMembership}`)
+      .set(bearer(owner.access))
+      .send({ role: "ADMIN", password: "wrong-password" })
+      .expect(403);
+    await server
+      .patch(`${base}/businesses/${businessId}/members/${staffMembership}`)
+      .set(bearer(owner.access))
+      .send({ role: "ADMIN", password })
+      .expect(200);
+    expect(
+      (
+        await server
+          .get(`${base}/businesses/${businessId}/locations`)
+          .set(bearer(staff.access))
+          .expect(200)
+      ).body,
+    ).toHaveLength(2);
+    await server
+      .post(`${base}/businesses/${businessId}/members`)
+      .set(bearer(staff.access))
+      .send({ userId: viewerUser.id, role: "OWNER" })
+      .expect(403);
     await server
       .delete(`${base}/businesses/${businessId}/members/${staffMembership}`)
       .set(bearer(owner.access))
@@ -798,6 +980,18 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
         operationKey: "concurrent-receipt-2026",
       })
       .expect(201);
+    expect(
+      (
+        (
+          await server
+            .get(
+              `${base}/businesses/${businessId}/inventory/expiry?locationId=${locationId}`,
+            )
+            .set(bearer(owner.access))
+            .expect(200)
+        ).body as { classification: string }[]
+      )[0].classification,
+    ).toBe("NONPERISHABLE");
     const orderUrl = `${base}/businesses/${businessId}/orders`;
     const results = await Promise.all(
       ["concurrent-sale-a", "concurrent-sale-b"].map((requestKey) =>
