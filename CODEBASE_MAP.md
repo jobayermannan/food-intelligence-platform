@@ -1,63 +1,25 @@
 # Food Intelligence Platform — codebase map
 
-Status: current paths describe **Legacy Prototype / Reference** only. Target repository is `food-intelligence-platform`. All target code lives beneath future `apps/api/`, `apps/web/`, `apps/docs/`, `packages/shared/`, or `docker/`; no target directories are created now. [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) defines the business independently. Proposed paths are not existing files.
+This map describes the implemented Backend 2.0 MVP. The business model comes from [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md), not from the legacy prototype.
 
-## Current implementation
-
-| Feature | Real file | Flow / collection |
+| Area | Files | Responsibility |
 | --- | --- | --- |
-| Startup/config/middleware | `index.js` | dotenv, Express, CORS, MongoClient, listener |
-| Identity/users/admin | `index.js` | inline routes → `users`; token/admin middleware unused |
-| Menu | `index.js` | GET `/menu` → `menu` |
-| Reviews | `index.js` | GET `/reviews` → `reviews` |
-| Carts | `index.js` | cart routes → `carts` |
-| Dependencies | `package.json`, `package-lock.json` | Express/MongoDB packages; failing test placeholder |
-| Setup/reference | `README.md`, `.env.example`, `.gitIgnore` | README now describes product/rename plan; legacy template remains unsafe/incomplete |
-| Unrelated frontend config | `vite.config.js` | no corresponding installed frontend dependencies/source |
+| HTTP bootstrap | `apps/api/src/main.ts`, `app.module.ts`, `config.ts` | Validation, CORS, Swagger, modules, configuration |
+| Authentication | `apps/api/src/auth/`, `common/auth.guard.ts` | Registration, verification, Argon2id login, JWT validation, rotating sessions, recovery |
+| Access | `apps/api/src/common/access.service.ts`, `business/` | Active membership, role and location grants; redacted audit trail; business/locations/member endpoints |
+| Catalog | `apps/api/src/catalog/` | Categories, products, suppliers and business scope |
+| Inventory | `apps/api/src/inventory/` | Receipt, FEFO allocation, transfer, adjustment, batches, balances and movements |
+| Sales and returns | `apps/api/src/sales/` | Server-calculated orders, allocations, bounded returns and restock/disposal |
+| Waste | `apps/api/src/waste/` | Batch waste, reason, immutable cost and stock movement |
+| Intelligence | `apps/api/src/insights/` | Expiry, rules-based discount recommendation/approval and scoped analytics |
+| Database | `apps/api/src/database/schema.ts`, `migrate.ts`, `apps/api/drizzle/` | PostgreSQL schema, composite business keys, migrations, role seed |
+| Integration tests | `apps/api/test/` | Real PostgreSQL HTTP/security/domain checks |
+| Infrastructure | `docker-compose.yml`, `docker/api.Dockerfile`, `.github/workflows/api.yml` | Local stack and CI quality gate |
+| Legacy reference | `legacy/index.js`, `legacy/package.json` | Original Express/MongoDB prototype, not imported |
+| Documentation | `apps/docs/content/` plus root Markdown | Authored content; no Astro runtime/business logic |
 
-## Proposed module convention
+The API is a modular monolith. Controllers validate DTOs, global auth verifies the current session, AccessService checks current business membership and location grants, and services use Drizzle transactions. InventoryService owns standard stock changes; SalesService handles sale allocations/returns in the same transaction and WasteService records batch waste. Analytics and recommendations read committed operational data and never mutate stock. No frontend, Redis, BullMQ, Socket.IO, payment, ML, cart or review module exists in the MVP.
 
-Each future `apps/api/src/modules/<name>/` contains its module/controller/service/repository, DTOs, policies, and unit tests. Schema lives in `apps/api/src/database/schema/`; migrations in `apps/api/drizzle/`; HTTP/integration tests in `apps/api/test/`. `apps/web/` owns Next.js; `apps/docs/` owns Astro documentation; `packages/shared/` owns deliberately shared public contracts only. No backend service imports legacy `index.js`; no frontend/shared package imports database implementation. Current Markdown stays under `docs/` until a reviewed relocation.
+Legacy → Backend 2.0 mapping is conceptual: `users` → `users` plus `business_memberships`; `menu` → `products` plus `categories`; `carts` → deferred `carts`/`cart_items`; `reviews` → deferred `reviews`; legacy JWT → entirely new authentication/session system. No live MongoDB data was imported.
 
-## MVP ownership
-
-MVP events below are logical future names only; no outbox/queue/socket infrastructure is required now. Initial expiry/recommendations/analytics are scoped REST queries. Only create files as features enter approved implementation.
-
-| Feature → module | Controller/service/repository prefix | Tables | Proposed event | Proposed job | Required test focus |
-| --- | --- | --- | --- | --- | --- |
-| Register/login/recovery → auth | auth | users, auth_sessions, auth_action_tokens | none public | none | verification, password hash, rotation/replay/revocation |
-| Business creation → businesses | businesses | businesses, business_memberships | none public | none | atomic owner creation, last-owner protection |
-| Membership → access | access | users, roles, business_memberships, membership_locations | none public | none | privilege matrix, tenant/location isolation |
-| Locations → locations | locations | inventory_locations | none initially | none | scoped administration and grants |
-| Products/suppliers → catalog | catalog | products, categories, suppliers | catalog.product_updated deferred | none | domain unit/price policy, no legacy schema assumption |
-| Purchase/stock → inventory | inventory | inventory, inventory_batches, inventory_movements | inventory.updated deferred | none in MVP | FEFO, concurrency, conservation |
-| Sale → sales | sales | orders, sale_items, sale_item_batch_allocations | sale.created, sale.updated deferred | none | idempotency, allocation/totals |
-| Sales returns → sales | sales | sale_returns, sale_return_items; calls Inventory | sale.updated deferred | none | allocation caps, tax reversal, disposition, retries |
-| Waste → waste | waste | waste_records; Inventory owns stock writes | waste.recorded deferred | none | cost and stock atomicity |
-| Expiry → expiry | expiry service; inventory read controller | reads scoped batches/business thresholds | deferred | none; request-time query | warning boundaries, unknown expiry, location scope |
-| Discounts → discounts | discounts | discounts; reads sales/stock | deferred | none; request-time baseline | reasons, floor/approval, coverage |
-| Analytics → analytics | analytics, query repository | read-only sales/returns/stock/waste | none | none | joins, returns, tax, authorized locations |
-
-## Deferred ownership — not MVP scaffolding
-
-| Feature → module | Future controller/service/repository prefix | Tables | Possible event | Possible job | Eventual test focus |
-| --- | --- | --- | --- | --- | --- |
-| Cart → carts, only if required | carts | carts, cart_items | none | none | ownership/repricing |
-| Reviews → reviews, only if required | reviews | reviews | none | none | visibility, actual required fields |
-| Forecasts → forecasting | forecasting, baseline adapter | forecast_runs, forecast_predictions | forecast.completed | forecast-generation | coverage, no data leakage |
-| Payments → payments | payments, providers/stripe.provider.ts | payments, payment_webhook_events | payment.updated | payment-reconcile | signature, replay, compensation |
-| Delivery → outbox/jobs | outbox service/repository; no public controller | outbox_events | relays owned domain events | outbox-delivery | crash recovery, duplicate delivery |
-| Realtime → realtime | realtime.gateway.ts; no business repository | no owned tables | forwards authorized event subset | none | room isolation, expiry/reconnect |
-
-## Inputs, outputs, boundaries
-
-- Controllers accept validated DTOs and verified principal context, then return versioned response DTOs. Repositories never trust raw request bodies.
-- Inventory accepts stock commands and returns recorded movements/balances. Sales, returns, and Waste invoke it with the shared transaction context; they never directly adjust batches. Returned-goods disposal records provenance without double stock decrement.
-- Catalog owns current product descriptions/prices; Sales owns historical snapshots. Editing catalog does not rewrite completed sales.
-- Analytics reads authorized-location facts; future Forecasting follows the same scope. Neither silently mutates stock or applies discounts. Recommendations require explicit authorized approval.
-- Payments accepts server-calculated order amounts and returns provider-neutral status. Provider-specific payloads stay inside adapters/inbox handling.
-- Future Realtime accepts committed envelopes for authorized business/location/user rooms. Future jobs call application services under explicit scope; neither is a current/MVP dependency.
-
-## File dependency flow
-
-See [module and file diagrams](docs/content/architecture/diagrams.md). Database infrastructure supplies one transaction manager; domain services do not depend on gateways or worker implementations. Agent navigation starts with this map, then [change impact](CHANGE_IMPACT_MAP.md), then actual source existence checks.
+Mermaid diagrams for intended and future flows remain in [apps/docs/content/architecture/diagrams.md](apps/docs/content/architecture/diagrams.md). Interpret future queues, payments, realtime and ML as proposals, not implemented modules.

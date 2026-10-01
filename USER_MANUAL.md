@@ -1,60 +1,29 @@
 # Food Intelligence Platform — user manual
 
-Status: **CURRENT SYSTEM is a Legacy Prototype / Reference. TARGET BACKEND 2.0 is independently designed, not a runnable upgrade. FUTURE ML/AI SERVICES do not exist here.** Target name is `food-intelligence-platform`; local/GitHub/package rename is pending as recorded in [README](README.md). No application frontend exists here.
+This manual describes the **implemented Backend 2.0 API** in `apps/api`. It has no graphical frontend yet. The legacy Express/MongoDB API in `legacy/` is a reference only and has known security blockers; do not use its `/jwt` endpoint for this product.
 
-## What the system does
+## Start and sign in
 
-Today the server lists menu items and reviews, creates/lists/deletes users, changes a user's admin role, and stores shopping-cart entries. It has serious access-control problems described in the [audit](BACKEND_AUDIT.md). Do not expose this version to untrusted users.
+Follow [README.md](README.md) to start PostgreSQL, Mailpit and the API. Browse `http://localhost:3000/api/docs` for the request schemas and endpoint list. Register with email, display name and a password of at least 12 characters at `POST /api/v1/auth/register`. Retrieve the verification token from Mailpit and submit it to `POST /api/v1/auth/verify-email`. Log in at `POST /api/v1/auth/login`. The response contains a 10-minute bearer access token and sets an HttpOnly refresh cookie. Use `POST /api/v1/auth/refresh` with the cookie and matching `Origin` header to rotate it. `POST /api/v1/auth/logout` and `logout-all` revoke sessions. `forgot-password` and `reset-password` use single-use mailed tokens.
 
-Food Intelligence Platform will let multiple food businesses track locations, suppliers, products, batches, sales, returns, waste, and expiry while keeping each business's data separate. Initial discount suggestions use explainable rules. Forecasting and advanced AI are later features, not implemented intelligence. [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) explains the independent business model; legacy CRUD does not supply its rules.
+Never store an access token or refresh token in browser local storage. On HTTPS deployment keep the refresh cookie Secure and use the configured application origin. The login flow requires a verified email and password; it does not accept an arbitrary email to issue a token.
 
-## Who can do what
+## Set up a business
 
-A person can join more than one business, and a business can have more than one location. Owners control the business and access; admins manage operations and staff/viewer grants. Staff receive stock and record sales/waste at assigned locations. Viewers read inventory and analytics at assigned locations. Staff/viewers with no location grant cannot access that location's operations. A business admin does not become an admin of another business.
+An authenticated user creates a business with name, IANA timezone, three-letter currency, default tax rate (fraction such as `0.10`), and a unique `requestKey`. Creation makes that user OWNER. The same global user may belong to several businesses; each request uses the chosen business ID and checks current membership. Create one or more locations, then categories, suppliers and products. A product has a fixed base unit (`piece`, `package`, `kg`, `gram`, `litre`, or `ml`) and sale price. Only kg/gram and litre/ml are converted exactly; piece/package use integer counts.
 
-The working login design is verified email/password with securely hashed passwords, short-lived access tokens, and rotating revocable sessions. Registration never lets someone choose an admin role. Logout revokes the session; changing roles takes effect on subsequent requests. The old email-only `/jwt` behavior is not reused.
+OWNER and ADMIN manage locations and operational catalog data. OWNER can grant higher roles after password reauthentication. ADMIN can grant only STAFF/VIEWER. STAFF and VIEWER receive explicit location grants; without a grant they cannot access that location. STAFF receives stock, records sales, and records waste at assigned locations. VIEWER reads assigned-location inventory and analytics. Membership revocation is checked on the next request. The last OWNER cannot be removed or demoted. OWNER can review redacted membership/role/grant audit events at `GET /api/v1/businesses/{businessId}/audit-events`.
 
-## How to start the current server for isolated development
+## Inventory, sales, returns and waste
 
-These instructions describe existing entry points; they were not executed in Phase 0. Use a disposable local/test MongoDB database, not production. Install a compatible Node.js/npm release after dependency review, run `npm ci` in the repository, and create a private `.env` with `MONGODB_URI`, `PORT` (defaults to 5000), and a newly generated `ACCESS_TOKEN_SECRET`. Do not copy the credential-like values from the current example file. Run `node index.js`; stop with Ctrl+C.
+Receive stock through `POST /api/v1/businesses/{businessId}/inventory/purchases` with product, location, quantity/unit, acquisition total, expiry status/date and operation key. Each receipt creates a batch and PURCHASE movement. Expiry dates are local calendar dates in the business timezone: stock remains usable through that date. UNKNOWN expiry stays separate from NONPERISHABLE and is not automatically saleable.
 
-The server explicitly selects database `BistroDB`. The MongoDB URI determines the server location; it is not known from this repository. GET `/` only returns text and does not prove database readiness. Most routes register after the connection succeeds. There is no usable test suite or Docker startup command yet. `npm test` currently reports that no test is specified.
+Create a sale at `POST /api/v1/businesses/{businessId}/orders`. One order belongs to one location and may contain multiple products. The API uses the current product price, one approved percentage discount per line if supplied, the business tax rate, and eligible batches in first-expire-first-out order. It records line snapshots, allocations and SALE movements atomically. Insufficient stock fails without a partial sale. Reusing a sale request key with different content fails.
 
-## Where things live and what changing them means
+OWNER/ADMIN can transfer stock between locations, preserving cost and expiry with linked TRANSFER_OUT/TRANSFER_IN movements. They can also make reasoned adjustments. Returns reference original allocations; quantities cannot exceed sold quantities. A physically inspected saleable return can be restocked with a RETURN movement. Disposed customer goods are recorded as waste without decrementing stock a second time. Ordinary stock waste records a reason, batch, quantity, cost and WASTE movement. `other` reason requires notes.
 
-All future paths in this table are proposals. [Codebase map](CODEBASE_MAP.md) provides details.
+`GET /api/v1/businesses/{businessId}/inventory/expiry` reports EXPIRED, CRITICAL, WARNING, SAFE, UNKNOWN and NONPERISHABLE states. Thresholds default to 24 and 72 hours and can be changed per business. `POST /discount-recommendations` returns a deterministic **Baseline recommendation** from expiry and recent sales; it makes no change. OWNER/ADMIN must explicitly approve a discount. The API enforces a percentage ceiling and batch-cost floor. `GET /analytics/{kind}` supports inventory, sales, revenue, waste, expiry and product performance within the caller's locations.
 
-| Technology | What it is / why we use it | Current or proposed location | What can break / safe replacement |
-| --- | --- | --- | --- |
-| Express + MongoDB | Legacy CRUD reference only | `index.js`; source database location from private URI | Leave source/data intact. Import only if an actual requirement is approved; do not port its architecture |
-| TypeScript | JavaScript with checked contracts | Proposed `apps/api/src/`, app TypeScript configuration | Build/type contracts; test new domain contracts |
-| NestJS | Organizes independently designed backend modules | Proposed `apps/api/src/main.ts`, `apps/api/src/modules/` | HTTP, guards, startup; verify module contracts without importing legacy code |
-| PostgreSQL | Durable relational data store | Proposed separate database service, not inside NestJS | Loss affects inventory/history. Back up, rehearse restore and migrations before changes |
-| Drizzle + pg | Schema/query layer and PostgreSQL driver | Proposed `apps/api/src/database/`, `apps/api/drizzle/` | Constraints/transactions; one migration authority, empty/upgrade tests |
-| Validation | Rejects malformed or unexpected input | Proposed DTOs using class-validator/class-transformer | Invalid data or rejected clients; contract tests before altering rules |
-| Authentication | Proves identity and enforces scoped permissions | Proposed Auth/Access in `apps/api/` | Account takeover/lockout; verify registration, password/session recovery, tenant/location checks |
-| Redis | Future jobs/cache infrastructure, not MVP | Deferred separate service | Queue/cache failures; PostgreSQL remains authoritative |
-| BullMQ | Future background processing when necessary | Deferred API workers | Missed/duplicate work; idempotency and recovery tests before adoption |
-| Socket.IO | Optional future live notices | Deferred API gateway | Data leakage/staleness; authorized rooms and REST refresh |
-| Payments | Optional future Stripe Test adapter for order payments | Deferred API payments module | Provider/idempotency tests; no live charges or platform billing in MVP |
-| Forecast adapter | Future baseline/model boundary | Deferred API forecasting module | Coverage/evaluation needed; no invented history |
-| Next.js | Main application frontend | Future `apps/web/` | User workflows/contracts; do not substitute Astro |
-| Astro 7 | Documentation portal only | Current `docs/`; future `apps/docs/` after reviewed move | Links/build may break on relocation; no business logic/database access |
-| Docker/Compose | Packages software and starts services | Future `docker/`; project name `food-intelligence-platform` | Startup/volumes; do not rename data volumes for branding |
-| GitHub Actions/quality gate | Automated checks on changes | Proposed `.github/workflows/` and scanner configuration | Unverified releases; keep required checks enforced during replacement |
+## Current limits
 
-## How Docker will work here
-
-After approved implementation, MVP Compose will start API and PostgreSQL on a development network, plus a development mail sink if local registration needs it. Workers/Redis are later additions only when required. PostgreSQL uses persistent storage; NestJS connects over its service address. Astro builds separately in `apps/docs/`. No Compose file exists today. Never delete or rename a data volume to fix startup or branding.
-
-## Where to change a feature
-
-Today: only prototype CRUD/API handling is in `index.js`, not meaningful food-domain logic. Later: `apps/api/` controllers own routes, services own domain rules, repositories/Drizzle own queries. Unit tests live beside modules, HTTP/integration tests in `apps/api/test/`. Future workers/gateways/adapters appear only when needed. `packages/shared/` contains safe public contracts, not database code. See [change-impact map](CHANGE_IMPACT_MAP.md).
-
-## Practical future workflows
-
-Create business → establish owner/members and location grants → define products/suppliers. Receive food with unit, quantity, cost, and expiry → ledger records it. Sell at one location → server calculates tax/discount snapshots and allocates FEFO stock. No online payment is required. Record waste → quantity and cost are saved with the batch. Returned goods only restock after inspection; refund records alone never add stock. Expiry queries show warnings without discarding food. An admin/owner approves a suggested discount.
-
-MVP supports piece/kg/gram/litre/ml/package with explicit base units; no negative stock. Restaurant and retail sales share a simple recorded-order model, without kitchen/recipe/table workflows. Carts, reviews, live payments, platform subscriptions, forecasting, and advanced AI are future scope unless approved.
-
-[API flows](API_USER_FLOW.md) and [visual map](docs/content/architecture/diagrams.md) show each path. To upgrade, follow the [upgrade guide](UPGRADE_GUIDE.md); documentation approval does not authorize a production rollout.
+The MVP has no online payment processing, cart/review API, POS integration, forecasting service, ML model, queues, realtime feed, notification delivery, or frontend. The local email sink and in-memory rate limiter need production replacements before multi-instance deployment. The API is operational, but tax handling is a deliberately simple default-rate model and is not a jurisdictional fiscal engine. See [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) for the model and [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the non-destructive legacy data strategy.

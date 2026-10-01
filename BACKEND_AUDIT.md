@@ -1,6 +1,6 @@
 # Backend audit
 
-Audit date: 2026-09-30. Status: **CURRENT SYSTEM**, inspected source only. Phase 0 changes documentation only. No live database, production configuration, or deployed clients were inspected. Target design is not implemented.
+Audit date: 2026-09-30. Status: **CURRENT SYSTEM**, inspected source only. Phase 0 changes documentation only. No live database, production configuration, or deployed clients were inspected. This audit is a historical snapshot of the legacy prototype; Backend 2.0 is now implemented separately in `apps/api`.
 
 Architectural correction (2026-10-01): this audit describes **Legacy Prototype / Reference**, not a meaningful food-business logic foundation. [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) now defines Food Intelligence Platform independently. Legacy data and source remain intact, but compatibility/import is conditional, not an MVP obligation. Original README findings below are historical; README has since been replaced with product identity and rename guidance. Runtime/package/environment findings remain unchanged.
 
@@ -18,7 +18,7 @@ JavaScript ES modules; Express `^4.21.0`; MongoDB native driver `^6.9.0`; jsonwe
 
 ## 3. Request flow
 
-Express CORS and JSON parsing → inline route handler → direct MongoDB operation → JSON/text response. Token/admin middleware is defined but attached to no route. `/` is registered outside database initialization. See [current and target diagrams](docs/content/architecture/diagrams.md).
+Express CORS and JSON parsing → inline route handler → direct MongoDB operation → JSON/text response. Token/admin middleware is defined but attached to no route. `/` is registered outside database initialization. See [current and target diagrams](apps/docs/content/architecture/diagrams.md).
 
 ## 4. Existing modules
 
@@ -80,7 +80,7 @@ Monolithic file, inconsistent responses/errors, no validated DTOs, no dependency
 | SEC-06 | Credential-like values committed in environment example | Owner verifies exposure, rotates/revokes affected secrets, sanitizes template and assesses history/logs |
 | SEC-07 | Missing authentication enforcement, including `/protected` | Route-by-route public/private policy and negative authorization tests |
 
-No secret values are reproduced here. Whether those values are active is unknown. Do not preserve insecure behavior for compatibility. Missing input validation permits unexpected values/operator-shaped inputs; permissive CORS and absent rate limits compound exposure. Security fixes are required later, not performed in Phase 0.
+No secret values are reproduced here. Whether those values are active is unknown. Do not preserve insecure behavior for compatibility. Missing input validation permits unexpected values/operator-shaped inputs; permissive CORS and absent rate limits compound exposure. The separate Backend 2.0 API addresses these patterns with new authentication and authorization; the legacy prototype remains unsafe and must not be exposed.
 
 ## 13. Performance risks
 
@@ -100,4 +100,4 @@ Design the new domain/module boundaries independently rather than refactoring pr
 
 ## 17. Missing Backend 2.0 capabilities
 
-All proposed business-scoped access, relational schema/migrations, batch stock/FEFO, movement ledger, sales allocations, waste, expiry, deterministic discounts, forecasting baselines, analytics, outbox, jobs, sockets, payment adapter, OpenAPI, containers, CI/quality gates, and operational tests remain unimplemented. Documentation created in Phase 0 is design evidence, not runtime evidence.
+The legacy prototype lacks these features. The separate Backend 2.0 API now implements business scope, relational schema/migrations, stock/FEFO, movements, sales/returns, waste, expiry, rules-based discounts, analytics, OpenAPI, Docker definitions, CI and tests. Forecasting, outbox, jobs, sockets and payments remain deferred.

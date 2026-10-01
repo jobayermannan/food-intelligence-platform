@@ -1,6 +1,6 @@
 # Food Intelligence Platform — product domain
 
-Status: **TARGET BACKEND 2.0 design; no implementation authorized**. Repository/product slug: `food-intelligence-platform`. This document supersedes earlier assumptions that the legacy prototype is a business-logic foundation or that its API must be preserved. Decisions below are explicit MVP design assumptions, not facts inferred from MongoDB or approvals to implement.
+Status: **Backend 2.0 MVP domain contract; implementation in `apps/api`**. Repository/product slug: `food-intelligence-platform`. This document supersedes earlier assumptions that the legacy prototype is a business-logic foundation or that its API must be preserved. Decisions below define the implemented MVP and remaining assumptions; they are not facts inferred from MongoDB.
 
 ## Product definition
 

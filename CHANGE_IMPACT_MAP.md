@@ -1,6 +1,6 @@
 # Change-impact map
 
-Status: **TARGET BACKEND 2.0 maintenance design** for Food Intelligence Platform. Current `index.js` is legacy CRUD reference, not domain logic to preserve. [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) governs MVP/deferred scope; target files follow [CODEBASE_MAP.md](CODEBASE_MAP.md) under `apps/api/` and do not exist yet. Compatibility is conditional on a real requirement.
+Status: **Backend 2.0 MVP maintenance map** for Food Intelligence Platform. `legacy/index.js` is legacy CRUD reference, not domain logic to preserve. [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) governs MVP/deferred scope; implemented files are listed in [CODEBASE_MAP.md](CODEBASE_MAP.md) under `apps/api/`. Compatibility is conditional on a real requirement.
 
 | Change | Affected owners / what can break | Required evidence and documentation |
 | --- | --- | --- |

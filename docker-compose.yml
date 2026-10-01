@@ -1,0 +1,45 @@
+name: food-intelligence-platform
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: food
+      POSTGRES_PASSWORD: food_dev_only
+      POSTGRES_DB: food_intelligence
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U food -d food_intelligence"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://food:food_dev_only@postgres:5432/food_intelligence
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    command: ["sh", "-c", "node dist/database/migrate.js && node dist/main.js"]
+volumes:
+  postgres_data:

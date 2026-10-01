@@ -1,21 +1,17 @@
 {
-  "name": "amr-project-serverr",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
+  "name": "food-intelligence-platform",
+  "version": "2.0.0",
+  "private": true,
+  "workspaces": ["apps/api"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run dev --workspace @food-intelligence-platform/api",
+    "build": "npm run build --workspace @food-intelligence-platform/api",
+    "typecheck": "npm run typecheck --workspace @food-intelligence-platform/api",
+    "lint": "npm run lint --workspace @food-intelligence-platform/api",
+    "format:check": "npm run format:check --workspace @food-intelligence-platform/api",
+    "test": "npm run test --workspace @food-intelligence-platform/api",
+    "db:generate": "npm run db:generate --workspace @food-intelligence-platform/api",
+    "db:migrate": "npm run db:migrate --workspace @food-intelligence-platform/api"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.9.0",
-    "nodemon": "^3.1.7"
-  }
+  "engines": {"node": ">=24.15.0"}
 }

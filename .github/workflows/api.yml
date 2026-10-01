@@ -1,0 +1,38 @@
+name: API quality
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: food
+          POSTGRES_PASSWORD: food_dev_only
+          POSTGRES_DB: food_intelligence_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U food -d food_intelligence_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://food:food_dev_only@localhost:5432/food_intelligence_test
+      JWT_SECRET: ci-test-secret-that-is-long-enough-for-hs256
+      APP_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run db:migrate
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high

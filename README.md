@@ -1,57 +1,35 @@
 # Food Intelligence Platform
 
-Target repository/local folder name: **food-intelligence-platform**.
+A multi-tenant REST backend for food businesses to manage products, suppliers, locations, inventory batches, sales, returns, expiry, waste, discounts, and basic analytics. The product model is defined in [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md).
 
-A multi-tenant food-business intelligence platform for restaurants and food businesses: products, suppliers, locations, batch inventory, sales, expiry, waste, discounts, analytics, and a trustworthy foundation for future forecasting and AI/ML recommendations.
+**Implementation status:** `apps/api` contains the Backend 2.0 NestJS MVP. `apps/docs` contains documentation content, not an Astro runtime. The Next.js frontend (`apps/web`), online payments, carts, reviews, advanced ML/AI, Redis/BullMQ, Socket.IO, and external integrations are deferred. The original Express/MongoDB prototype is preserved in `legacy/` for reference; it is not imported by the API. No MongoDB data was migrated or deleted.
 
-**Status: architecture/documentation only.** The only executable application here is a small Express/MongoDB **Legacy Prototype / Reference** in `index.js`. It is not the business-logic foundation and must not shape the new domain. No NestJS backend, Next.js application, Astro runtime, PostgreSQL migrations, or Docker setup has been implemented.
+## Repository
 
-## Start with the domain
+- `apps/api/` — NestJS, TypeScript, Drizzle schema/migrations, REST/OpenAPI, Jest/Supertest integration tests.
+- `apps/docs/` — authored documentation content; Astro 7 renderer remains future documentation work only.
+- `docker/` and `docker-compose.yml` — API, PostgreSQL, and Mailpit local stack.
+- `.github/workflows/api.yml` — lint, typecheck, migration, PostgreSQL-backed tests, build, and production dependency audit.
+- `legacy/` — unchanged prototype source/package files. Its former credential-like example is kept locally as an ignored file and is not part of the Backend 2.0 configuration.
 
-[PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) defines actors, multi-tenancy, permissions, authentication, inventory/sales/waste rules, MVP scope, assumptions, and conceptual legacy mapping. [DATABASE_DESIGN.md](DATABASE_DESIGN.md) separates MVP tables from deferred candidates. [STACK_DECISION.md](STACK_DECISION.md) and [CODEBASE_MAP.md](CODEBASE_MAP.md) explain technology and ownership.
+The GitHub repository is [jobayermannan/food-intelligence-platform](https://github.com/jobayermannan/food-intelligence-platform). The active local checkout is `E:\Food related software\food-intelligence-platform`. Existing Git history was retained.
 
-The MVP records business operations; online payments, SaaS billing, advanced ML, carts/reviews, external integrations, and realtime/queue infrastructure are deferred unless a concrete requirement justifies them. Initial discount recommendations are rules, not AI. See [API_USER_FLOW.md](API_USER_FLOW.md), [USER_MANUAL.md](USER_MANUAL.md), and [architecture diagrams](docs/content/architecture/diagrams.md).
+## Local development
 
-## Target repository structure — not created yet
+Use Node.js 24 and npm. Copy `.env.example` to `.env`, replace `JWT_SECRET` with a unique random value of at least 32 bytes, and keep `.env` untracked. For a fully containerized setup, run `docker compose up --build`. The API listens on port 3000, PostgreSQL on 5432, and the development email sink at `http://localhost:8025`. Compose runs migrations before API startup. The example database password is for local development only.
 
-```text
-food-intelligence-platform/
-├── apps/
-│   ├── api/          # NestJS backend, domain, Drizzle schema/tests
-│   ├── web/          # Next.js application frontend
-│   └── docs/         # Astro 7 documentation only
-├── packages/
-│   └── shared/       # Safe shared contracts, not server internals
-├── docker/          # Future Dockerfiles/Compose and infrastructure guidance
-├── .github/         # Future CI/CD workflows
-├── README.md
-└── PRODUCT_DOMAIN.md
-```
+For a host-run API with containerized dependencies, start `docker compose up postgres mailpit`, run `npm ci`, `npm run db:migrate`, then `npm run dev`. Set `SMTP_HOST=localhost` and `DATABASE_URL=postgres://food:food_dev_only@localhost:5432/food_intelligence` in the host process or `.env`. Readiness is `GET /health/ready`; liveness is `GET /health/live`. OpenAPI UI is `/api/docs`.
 
-`docs/` currently contains authored Markdown. Its future home is `apps/docs/`; no directory was moved. NestJS owns business logic/authentication/database access. Next.js owns the main UI. Astro only renders reviewed documentation. Shared code must not leak database credentials, repositories, or server-only modules into either frontend.
+The verification email contains a single-use token for `POST /api/v1/auth/verify-email`. Access tokens belong in memory; the server sets the HttpOnly refresh cookie. Refresh/logout require an `Origin` equal to `APP_ORIGIN`. For local HTTP only, set `COOKIE_SECURE=false`; keep secure cookies enabled for HTTPS deployment.
 
-## Identity and rename assessment
+## Quality checks
 
-| Surface | Current verified identity | Target / status |
-| --- | --- | --- |
-| Product documentation | Former Bistro/AMR prototype branding | Food Intelligence Platform — updated in documentation |
-| Local repository | `E:\Food related software\amr-project-server` | `E:\Food related software\food-intelligence-platform` — pending safe rename |
-| Codex project root | `E:\Food related software` | Parent can remain; update/reopen any child-path references after rename |
-| GitHub origin | `https://github.com/jobayermannan/amr-project-server` | `https://github.com/jobayermannan/food-intelligence-platform` — pending owner rename |
-| Root package / lockfile root metadata | `amr-project-serverr` | `food-intelligence-platform`, private monorepo root; future app packages `@food-intelligence-platform/api`, `@food-intelligence-platform/web`, `@food-intelligence-platform/docs` — not changed now |
-| Runtime strings / MongoDB | Bistro labels and `BistroDB` in `index.js` | New app identity `food-intelligence-platform-api`; leave legacy database identity untouched |
-| Docker | No files or resources defined in this repository | Future Compose project `food-intelligence-platform`, services api/postgres and later worker/redis, image `food-intelligence-platform-api`; no resources renamed |
+Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm audit --omit=dev --audit-level=high`. Integration tests require an **isolated PostgreSQL database whose name ends in `_test`** and `DATABASE_URL` set to it. Run `npm run db:migrate` against that database first. Tests truncate its `users` table and dependent data; never point tests at development or production data.
 
-Only documentation is authorized in this pass. Package metadata, lockfile, runtime labels, directories, Git remote, and hosted repository have **not** been renamed. One local Git worktree was observed; external editor/process references and GitHub administration rights are unverified.
+`apps/api/drizzle/` contains the generated migrations. Migration 0000 deliberately creates unique indexes before composite foreign keys because PostgreSQL requires referenced keys to exist first. Later migrations retain generated snapshots; never run `db:generate` and apply a new file without reviewing the SQL ordering.
 
-**Exact manual GitHub step:** open [the existing repository settings](https://github.com/jobayermannan/amr-project-server/settings), go to **General → Repository name**, enter `food-intelligence-platform`, and click **Rename** as a repository administrator. Review integrations/Pages references and name availability first. Then update this clone's origin to `https://github.com/jobayermannan/food-intelligence-platform` and verify remote configuration. This follows [GitHub's rename instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository); it has not been performed here.
+## Boundaries and caveats
 
-**Local rename, later:** preserve all uncommitted documentation, stop processes/editors using the child directory, verify the destination does not exist, and rename only `amr-project-server` to `food-intelligence-platform` inside the existing parent. Reopen the child checkout and verify Git status, remotes, scripts, editor tasks, and absolute-path links. Do not move the parent workspace, re-clone over local work, rename MongoDB data, or rename Docker volumes as branding. See [transition plan](MIGRATION_PLAN.md).
+Every business-owned request checks an active membership and, for staff/viewer, location grants. The shared PostgreSQL schema uses business IDs and composite relationships for isolation. Stock changes use transactions, row locks, immutable movements, and numeric quantities/costs. Rules-based discount recommendations are labelled **Baseline recommendation** and do not mutate prices or stock. Online payments are absent.
 
-## Running the legacy reference
-
-For isolated inspection only, use [USER_MANUAL.md](USER_MANUAL.md). The prototype has blocking authentication/authorization findings in [BACKEND_AUDIT.md](BACKEND_AUDIT.md). Its email-only JWT endpoint is not the new login flow. No usable test suite exists today; `npm test` is a failing placeholder.
-
-## Documentation and approvals
-
-[Portal design](docs/README.md) describes current content and target `apps/docs/`. [Change impact](CHANGE_IMPACT_MAP.md), [agent guide](AGENTIC_DEVELOPMENT_GUIDE.md), and [upgrade guide](UPGRADE_GUIDE.md) govern future changes. Legacy import/compatibility is conditional on a real requirement, not scheduled by default. Phase 1 requires explicit approval; no application implementation or data migration has started.
+The in-process rate limiter is suitable for a single MVP API instance; production scaling needs a shared limiter and operations review. Mailpit is a development sink, not a production email provider. Docker image/Compose execution requires a working Docker daemon; CI validates the API against PostgreSQL. See [USER_MANUAL.md](USER_MANUAL.md), [CODEBASE_MAP.md](CODEBASE_MAP.md), [DATABASE_DESIGN.md](DATABASE_DESIGN.md), [MIGRATION_PLAN.md](MIGRATION_PLAN.md), and [security audit](BACKEND_AUDIT.md).
