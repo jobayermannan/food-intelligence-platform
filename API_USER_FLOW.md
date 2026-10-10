@@ -4,7 +4,8 @@
 
 ```mermaid
 flowchart LR
-  C[Client] --> V[NestJS validation and auth guard]
+  C[Next.js web app] --> P[Same-origin API rewrite]
+  P --> V[NestJS validation and auth guard]
   V --> A[Membership and location access]
   A --> S[Domain service]
   S --> T[PostgreSQL transaction]
@@ -24,3 +25,5 @@ Receive stock creates a batch, PURCHASE movement and position increase in one tr
 Request-time expiry classification uses each business's configured critical/warning hours and batch expiry as exclusive next-day start. Analytics are scoped to the caller's authorized locations. The rules-based **Baseline recommendation** reads near-expiry batches and recent sales velocity, returning reasons without mutation. OWNER/ADMIN explicitly approve a discount with cost-floor validation. No queue, Socket.IO, payment or ML workflow is active.
 
 Endpoint families: `auth`, `businesses`, `businesses/{id}/locations`, `members`, `categories`, `products`, `suppliers`, `inventory`, `orders`, `waste`, `inventory/expiry`, `discount-recommendations`, `discounts`, and `analytics/{kind}`. Use the generated OpenAPI page for exact request DTOs and status codes. [USER_MANUAL.md](USER_MANUAL.md) gives operational instructions; [CODEBASE_MAP.md](CODEBASE_MAP.md) links ownership to source.
+
+The product frontend reads sale allocation IDs and previously returned quantities from order detail to construct a bounded return, reads approved discounts before a sale, and reads member location grants for team management. These are scoped, permission-checked responses; the backend remains authoritative for all mutations.

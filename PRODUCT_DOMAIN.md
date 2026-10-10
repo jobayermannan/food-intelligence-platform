@@ -117,7 +117,7 @@ Products/categories/suppliers belong to the business; inventory joins product an
 
 Backend 2.0 MVP includes authentication/sessions, multi-tenancy, users/roles, businesses/memberships/location access, products/categories/suppliers, transactional batch inventory/movements/transfers, staff-recorded sales and bounded returns, waste, expiry detection, basic rule-based discounts, basic analytics, REST/OpenAPI, Jest/Supertest, Docker, CI/CD, security checks, and maintained documentation. Expiry/analytics are initially request-time indexed queries; no queue, notification-delivery, or forecasting persistence is needed to make them work.
 
-Next.js is the application frontend target but no frontend implementation is authorized. Astro 7 is the documentation target at `apps/docs/`, with no business logic/database access. Do not create empty modules/tables just to resemble the future architecture.
+Next.js now implements the application frontend in `apps/web/` for the existing Backend 2.0 workflows. Astro 7 remains the documentation portal at `apps/docs/`, with no business logic/database access. Do not create empty modules/tables just to resemble the future architecture.
 
 ## Future scope
 

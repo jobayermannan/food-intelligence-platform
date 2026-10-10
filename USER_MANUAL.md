@@ -1,6 +1,12 @@
 # Food Intelligence Platform — user manual
 
-This manual describes the **implemented Backend 2.0 API** in `apps/api`. It has no graphical frontend yet. The legacy Express/MongoDB API in `legacy/` is a reference only and has known security blockers; do not use its `/jwt` endpoint for this product.
+This manual describes the **Backend 2.0 API and Next.js frontend** in `apps/api` and `apps/web`. The legacy Express/MongoDB API in `legacy/` is a reference only and has known security blockers; do not use its `/jwt` endpoint for this product.
+
+## Use the product frontend
+
+Start the backend and `npm run web:dev` as described in [README.md](README.md), then open `http://localhost:3001`. Register, read the token in local Mailpit, and verify your email in the frontend. Sign in and create a business with its timezone, currency, and tax rate. Add a location in **Business settings**, then a category, products and suppliers in **Products & suppliers**. Use **Inventory** to receive batches and inspect the movement ledger. **Sales & returns** records server-calculated sales and shows the exact batch allocations needed for returns. **Waste** records discarded stock; **Expiry & discounts** shows batch warnings, baseline suggestions and approval. **Analytics** shows available all-time aggregates. **Team & access** accepts a registered user's ID from their **Account** page and grants roles and locations.
+
+The translucent glass interface uses the selected business and active location for each screen. Switching workspace resets location-specific views. Owner/admin manage business data, staff handle assigned operations, and viewers see assigned read-only views. The server enforces all permissions. The frontend stores access tokens only in memory and uses the API's HttpOnly refresh cookie; a browser restart attempts session restoration. Lists have backend limits of 100 records (1,000 for expiry), so a full historical report requires future pagination. The dashboard is an on-demand snapshot, not a live feed.
 
 ## Start and sign in
 
@@ -26,4 +32,4 @@ OWNER/ADMIN can transfer stock between locations, preserving cost and expiry wit
 
 ## Current limits
 
-The MVP has no online payment processing, cart/review API, POS integration, forecasting service, ML model, queues, realtime feed, notification delivery, or frontend. The local email sink and in-memory rate limiter need production replacements before multi-instance deployment. The API is operational, but tax handling is a deliberately simple default-rate model and is not a jurisdictional fiscal engine. See [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) for the model and [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the non-destructive legacy data strategy.
+The MVP has no online payment processing, cart/review API, POS integration, forecasting service, ML model, queues, realtime feed, or notification delivery. The local email sink and in-memory rate limiter need production replacements before multi-instance deployment. The API is operational, but tax handling is a deliberately simple default-rate model and is not a jurisdictional fiscal engine. See [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md) for the model and [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for the non-destructive legacy data strategy.

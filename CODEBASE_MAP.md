@@ -1,6 +1,6 @@
 # Food Intelligence Platform — codebase map
 
-This map describes the implemented Backend 2.0 MVP. The business model comes from [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md), not from the legacy prototype.
+This map describes the implemented Backend 2.0 MVP and the Next.js product frontend. The business model comes from [PRODUCT_DOMAIN.md](PRODUCT_DOMAIN.md), not from the legacy prototype.
 
 | Area | Files | Responsibility |
 | --- | --- | --- |
@@ -14,11 +14,15 @@ This map describes the implemented Backend 2.0 MVP. The business model comes fro
 | Intelligence | `apps/api/src/insights/` | Expiry, rules-based discount recommendation/approval and scoped analytics |
 | Database | `apps/api/src/database/schema.ts`, `migrate.ts`, `apps/api/drizzle/` | PostgreSQL schema, composite business keys, migrations, role seed |
 | Integration tests | `apps/api/test/` | Real PostgreSQL HTTP/security/domain checks |
+| Product routes and layout | `apps/web/src/app/` | Next.js pages, shared glassmorphism styles, auth and workspace layouts |
+| Product UI workflows | `apps/web/src/features/` | Dashboard, catalog, inventory, sales/returns, waste, expiry/discounts, analytics, team, settings, account |
+| Browser API/session | `apps/web/src/lib/`, `apps/web/src/components/` | Typed API requests, memory-only access token, refresh cookie flow, tenant/location state, reusable accessible UI |
+| Product tests | `apps/web/test/` | Role capability, exact-money and return-disposition checks |
 | Infrastructure | `docker-compose.yml`, `docker/api.Dockerfile`, `.github/workflows/api.yml` | Local stack and CI quality gate |
 | Legacy reference | `legacy/index.js`, `legacy/package.json` | Original Express/MongoDB prototype, not imported |
-| Documentation | `apps/docs/content/` plus root Markdown | Authored content; no Astro runtime/business logic |
+| Documentation | `apps/docs/src/`, `apps/docs/content/` plus root Markdown | Astro 7 architecture portal; no application business logic |
 
-The API is a modular monolith. Controllers validate DTOs, global auth verifies the current session, AccessService checks current business membership and location grants, and services use Drizzle transactions. InventoryService owns standard stock changes; SalesService handles sale allocations/returns in the same transaction and WasteService records batch waste. Analytics and recommendations read committed operational data and never mutate stock. No frontend, Redis, BullMQ, Socket.IO, payment, ML, cart or review module exists in the MVP.
+The API is a modular monolith. Controllers validate DTOs, global auth verifies the current session, AccessService checks current business membership and location grants, and services use Drizzle transactions. InventoryService owns standard stock changes; SalesService handles sale allocations/returns in the same transaction and WasteService records batch waste. Analytics and recommendations read committed operational data and never mutate stock. The frontend calls these endpoints through the same-origin Next.js `/api` rewrite. Small read-response additions expose sale allocations and returned quantities, approved discounts, and member location grants so the UI can complete existing workflows. Redis, BullMQ, Socket.IO, payment, ML, cart and review modules do not exist in this MVP.
 
 Legacy → Backend 2.0 mapping is conceptual: `users` → `users` plus `business_memberships`; `menu` → `products` plus `categories`; `carts` → deferred `carts`/`cart_items`; `reviews` → deferred `reviews`; legacy JWT → entirely new authentication/session system. No live MongoDB data was imported.
 
