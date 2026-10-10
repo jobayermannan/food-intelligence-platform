@@ -1,0 +1,17 @@
+---
+import Shell from '../layouts/Shell.astro';
+import atlas from '../data/generated.json';
+import { documents } from '../lib/documents';
+---
+<Shell>
+  <section class="page-heading">
+    <div><div class="eyebrow"><span class="tiny-compass">✳</span> YOUR GUIDE TO WHAT CONNECTS WHAT</div><h1 id="page-title">Know your platform.<br/><span>One connection at a time.</span></h1><p id="page-description">Explore the web app and backend like a world map. Pick a place, follow a journey,<br class="desktop-break"/> or open a file to see the part it plays.</p></div>
+    <div class="snapshot"><div class="snapshot-label"><span class="dot"></span> SOURCE SNAPSHOT</div><div class="snapshot-counts"><span><strong>{atlas.files.length}</strong>API files</span><span><strong>{atlas.repositoryFiles.filter(file => file.path.startsWith('apps/web/src/')).length}</strong>web files</span><span><strong>{atlas.endpoints.length}</strong>routes</span><span><strong>{atlas.tables.length}</strong>tables</span></div><div class="snapshot-foot">Read-only map · <code>{atlas.revision.slice(0,7)}</code></div></div>
+  </section>
+  <div class="explore-bar"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Find a module, file, API, or table…" aria-label="Search the architecture" autocomplete="off"/><kbd>/</kbd></label><div class="mode-switch" role="group" aria-label="Explanation level"><button id="simple-mode" class="selected" aria-pressed="true">Plain language</button><button id="technical-mode" aria-pressed="false">Technical</button></div></div>
+  <div id="search-results" class="search-results" hidden aria-live="polite"></div>
+  <div id="view-content"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script id="atlas-data" type="application/json" set:html={JSON.stringify({atlas,documents:documents.map(({slug,title,category,status})=>({slug,title,category,status}))}).replaceAll('<','\u003c')} />
+  <script>import '../scripts/explorer';</script>
+</Shell>

@@ -1,0 +1,27 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import { documents } from '../../lib/documents';
+export function getStaticPaths(){ return documents.map(doc=>({params:{slug:doc.slug},props:{doc}})); }
+const { doc } = Astro.props;
+---
+<Shell title={doc.title} reading>
+  <div class="reading-heading"><a class="back-link" href="/#docs">← All field guides</a><span class="tag">{doc.category} · {doc.status}</span></div>
+  <article class="prose" set:html={doc.html}></article>
+  <div class="document-source">Source: <code>{doc.file}</code> · Diagrams marked “deferred” describe future architecture.</div>
+  <script>
+    const blocks = Array.from(document.querySelectorAll<HTMLElement>('code.language-mermaid'));
+    if (blocks.length) {
+      const { default: mermaid } = await import('mermaid');
+      mermaid.initialize({ startOnLoad:false,securityLevel:'strict',theme:'neutral',fontFamily:'system-ui' });
+      for (const [index,code] of blocks.entries()) {
+        try {
+          const {svg} = await mermaid.render(`diagram-${index}`,code.textContent ?? '');
+          const figure=document.createElement('figure'); figure.className='mermaid-figure'; figure.innerHTML=svg;
+          const caption=document.createElement('figcaption'); caption.textContent='Architecture diagram · source available below'; figure.append(caption);
+          const details=document.createElement('details'); const summary=document.createElement('summary'); summary.textContent='Show Mermaid source'; details.append(summary);
+          const pre=code.parentElement!; pre.replaceWith(figure,details); details.append(pre);
+        } catch { const notice=document.createElement('p'); notice.textContent='This diagram could not render. Its Mermaid source is shown below.'; code.parentElement?.before(notice); }
+      }
+    }
+  </script>
+</Shell>
