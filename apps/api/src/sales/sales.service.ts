@@ -271,7 +271,50 @@ export class SalesService {
       .where(
         and(eq(saleItems.businessId, businessId), eq(saleItems.orderId, id)),
       );
-    return { ...order, items };
+    const assigned = items.length
+      ? await this.database.db
+          .select()
+          .from(allocations)
+          .where(
+            and(
+              eq(allocations.businessId, businessId),
+              inArray(
+                allocations.saleItemId,
+                items.map((item) => item.id),
+              ),
+            ),
+          )
+      : [];
+    const returned = assigned.length
+      ? await this.database.db
+          .select()
+          .from(returnItems)
+          .where(
+            and(
+              eq(returnItems.businessId, businessId),
+              inArray(
+                returnItems.allocationId,
+                assigned.map((allocation) => allocation.id),
+              ),
+            ),
+          )
+      : [];
+    return {
+      ...order,
+      items: items.map((item) => ({
+        ...item,
+        allocations: assigned
+          .filter((allocation) => allocation.saleItemId === item.id)
+          .map((allocation) => ({
+            ...allocation,
+            returnedQuantity: returned
+              .filter((line) => line.allocationId === allocation.id)
+              .reduce((sum, line) => sum.plus(line.quantity), new Decimal(0))
+              .toFixed(6),
+          })),
+      })),
+      returns: returned,
+    };
   }
   async returnSale(
     userId: string,

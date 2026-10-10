@@ -124,6 +124,9 @@ export class BusinessService {
         role: roles.code,
         timezone: businesses.timezone,
         currency: businesses.currency,
+        defaultTaxRate: businesses.defaultTaxRate,
+        expiryCriticalHours: businesses.expiryCriticalHours,
+        expiryWarningHours: businesses.expiryWarningHours,
       })
       .from(memberships)
       .innerJoin(businesses, eq(memberships.businessId, businesses.id))
@@ -256,7 +259,7 @@ export class BusinessService {
   }
   async listMembers(userId: string, businessId: string) {
     await this.access.require(userId, businessId, ["OWNER", "ADMIN"]);
-    return this.database.db
+    const members = await this.database.db
       .select({
         id: memberships.id,
         userId: users.id,
@@ -268,6 +271,16 @@ export class BusinessService {
       .innerJoin(users, eq(memberships.userId, users.id))
       .innerJoin(roles, eq(memberships.roleId, roles.id))
       .where(eq(memberships.businessId, businessId));
+    const grants = await this.database.db
+      .select()
+      .from(membershipLocations)
+      .where(eq(membershipLocations.businessId, businessId));
+    return members.map((member) => ({
+      ...member,
+      locationIds: grants
+        .filter((grant) => grant.membershipId === member.id)
+        .map((grant) => grant.locationId),
+    }));
   }
   async changeRole(
     userId: string,

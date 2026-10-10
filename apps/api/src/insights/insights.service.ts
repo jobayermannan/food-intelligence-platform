@@ -34,6 +34,31 @@ export class InsightsService {
         ? inArray(column, scope.locations)
         : sql`false`;
   }
+  async listDiscounts(userId: string, businessId: string, locationId?: string) {
+    const scope = await this.access.require(
+      userId,
+      businessId,
+      ["OWNER", "ADMIN", "STAFF", "VIEWER"],
+      locationId,
+    );
+    // Batch-specific rules are visible only through an authorized location.
+    const rows = await this.database.db
+      .select({ rule: discounts, locationId: inventory.locationId })
+      .from(discounts)
+      .leftJoin(batches, eq(discounts.batchId, batches.id))
+      .leftJoin(inventory, eq(batches.inventoryId, inventory.id))
+      .where(
+        and(
+          eq(discounts.businessId, businessId),
+          sql`(${discounts.batchId} is null or (${this.locations(scope, inventory.locationId)} and ${locationId ? eq(inventory.locationId, locationId) : sql`true`}))`,
+        ),
+      )
+      .limit(100);
+    return rows.map(({ rule, locationId: location }) => ({
+      ...rule,
+      locationId: location,
+    }));
+  }
   async expiry(
     userId: string,
     businessId: string,

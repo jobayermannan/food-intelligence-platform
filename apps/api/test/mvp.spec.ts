@@ -312,6 +312,18 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
     expect(assigned.find((row) => row.batchId === late)?.quantity).toBe(
       "2.000000",
     );
+    const saleDetail = await server
+      .get(`${base}/businesses/${businessA}/orders/${order.id}`)
+      .set(bearer(a.access))
+      .expect(200);
+    expect(saleDetail.body.items[0].allocations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: assigned[0].id,
+          returnedQuantity: "0.000000",
+        }),
+      ]),
+    );
     await server
       .post(`${base}/businesses/${businessA}/orders`)
       .set(bearer(a.access))
@@ -343,6 +355,15 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
       })
       .expect(201);
     expect(returned.body.totalAmount).toBe("11.000000");
+    const afterReturn = await server
+      .get(`${base}/businesses/${businessA}/orders/${order.id}`)
+      .set(bearer(a.access))
+      .expect(200);
+    expect(
+      afterReturn.body.items[0].allocations.find(
+        (allocation: { id: string }) => allocation.id === assigned[0].id,
+      ).returnedQuantity,
+    ).toBe("1.000000");
     await server
       .post(`${base}/businesses/${businessA}/orders/${order.id}/returns`)
       .set(bearer(a.access))
@@ -487,6 +508,15 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
         explanation: "Expiry approved",
       })
       .expect(201);
+    const visibleDiscounts = await server
+      .get(`${base}/businesses/${businessA}/discounts?locationId=${loc1}`)
+      .set(bearer(a.access))
+      .expect(200);
+    expect(visibleDiscounts.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: approved.body.id, locationId: loc1 }),
+      ]),
+    );
     const discountedOrder = await server
       .post(`${base}/businesses/${businessA}/orders`)
       .set(bearer(a.access))
@@ -871,7 +901,10 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
         .get(`${base}/businesses/${businessId}/members`)
         .set(bearer(owner.access))
         .expect(200)
-    ).body as { id: string; role: string }[];
+    ).body as { id: string; role: string; locationIds: string[] }[];
+    expect(members.find((m) => m.id === staffMembership)?.locationIds).toEqual([
+      locationA,
+    ]);
     const ownerMembership = members.find((m) => m.role === "OWNER")!.id;
     await server
       .delete(`${base}/businesses/${businessId}/members/${ownerMembership}`)

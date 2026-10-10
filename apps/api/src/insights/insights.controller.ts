@@ -8,6 +8,13 @@ import { ApproveDiscountDto, RecommendationDto } from "./insights.dto";
 @Controller("api/v1/businesses/:businessId")
 export class InsightsController {
   constructor(private readonly service: InsightsService) {}
+  @Get("discounts") listDiscounts(
+    @Req() r: AuthedRequest,
+    @Param("businessId") b: string,
+    @Query("locationId") loc?: string,
+  ) {
+    return this.service.listDiscounts(r.principal.userId, b, loc);
+  }
   @Get("inventory/expiry") expiry(
     @Req() r: AuthedRequest,
     @Param("businessId") b: string,
