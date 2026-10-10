@@ -5,4 +5,6 @@
 .env.*
 !.env.example
 legacy
-apps/docs
+apps/docs/**
+!apps/docs/package.json
+**/.next
