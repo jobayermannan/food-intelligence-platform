@@ -1,0 +1,26 @@
+{
+  "name": "@food-intelligence-platform/docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "atlas": "node scripts/generate-atlas.mjs",
+    "dev": "npm run atlas && astro dev --host 127.0.0.1 --port 4321",
+    "build": "npm run atlas && astro build",
+    "check": "npm run atlas && astro check",
+    "test": "npm run atlas && node --test scripts/atlas.test.mjs",
+    "preview": "astro preview --host 127.0.0.1 --port 4321"
+  },
+  "dependencies": {
+    "astro": "7.3.5",
+    "cookie": "2.0.1",
+    "marked": "18.0.14",
+    "mermaid": "12.1.0",
+    "sanitize-html": "2.18.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/sanitize-html": "^2.16.0",
+    "typescript": "^5.9.2"
+  }
+}

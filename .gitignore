@@ -6,3 +6,9 @@ coverage/
 !.env.example
 legacy/.env.example.local
 *.log
+.astro/
+apps/docs/src/data/generated.json
+
+.next/
+*.tsbuildinfo
+repomix-output.xml

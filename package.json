@@ -2,8 +2,16 @@
   "name": "food-intelligence-platform",
   "version": "2.0.0",
   "private": true,
-  "workspaces": ["apps/api"],
+  "workspaces": [
+    "apps/api",
+    "apps/docs",
+    "apps/web"
+  ],
   "scripts": {
+    "docs:dev": "npm run dev --workspace @food-intelligence-platform/docs",
+    "docs:build": "npm run build --workspace @food-intelligence-platform/docs",
+    "docs:check": "npm run check --workspace @food-intelligence-platform/docs",
+    "docs:test": "npm run test --workspace @food-intelligence-platform/docs",
     "dev": "npm run dev --workspace @food-intelligence-platform/api",
     "build": "npm run build --workspace @food-intelligence-platform/api",
     "typecheck": "npm run typecheck --workspace @food-intelligence-platform/api",
@@ -11,7 +19,13 @@
     "format:check": "npm run format:check --workspace @food-intelligence-platform/api",
     "test": "npm run test --workspace @food-intelligence-platform/api",
     "db:generate": "npm run db:generate --workspace @food-intelligence-platform/api",
-    "db:migrate": "npm run db:migrate --workspace @food-intelligence-platform/api"
+    "db:migrate": "npm run db:migrate --workspace @food-intelligence-platform/api",
+    "web:dev": "npm run dev --workspace @food-intelligence-platform/web",
+    "web:build": "npm run build --workspace @food-intelligence-platform/web",
+    "web:check": "npm run typecheck --workspace @food-intelligence-platform/web",
+    "web:test": "npm run test --workspace @food-intelligence-platform/web"
   },
-  "engines": {"node": ">=24.15.0"}
+  "engines": {
+    "node": ">=24.15.0"
+  }
 }
