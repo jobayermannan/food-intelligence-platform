@@ -26,3 +26,7 @@ export function selectBusinessId(businesses: Pick<Business, "id">[], preferredId
 export function selectLocationId(locations: Pick<Location, "id" | "archivedAt">[], preferredId: string) {
   return locations.find(l => l.id === preferredId && !l.archivedAt)?.id ?? locations.find(l => !l.archivedAt)?.id ?? "";
 }
+
+export function workspaceBootPending(sessionReady: boolean, hasUser: boolean, hasSessionError: boolean, selectionReady: boolean) {
+  return !sessionReady || (!hasUser && !hasSessionError) || (hasUser && !selectionReady);
+}

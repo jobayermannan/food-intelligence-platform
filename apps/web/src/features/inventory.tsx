@@ -6,8 +6,8 @@ import { date, manages, money, operates, quantity, shortId } from "@/lib/domain"
 import type { BatchRow, Movement, Position, Product, Supplier } from "@/lib/models";
 import { useResource,useWorkspace } from "@/components/workspace";
 import { ActionForm,Badge,Button,Empty,ErrorBox,Field,LimitNote,Loading,Modal,PageTitle,Panel,Select,Stat,Table,optional,value } from "@/components/ui";
-export function Inventory() {
-  const {business,locationId,locations,path,refresh,toast} = useWorkspace(); const [tab,setTab] = useState("positions"),[search,setSearch] = useState(""),[action,setAction] = useState<string | null>(null),[expiry,setExpiry] = useState("known");
+export function Inventory({initialTab = "positions"}: {initialTab?: "positions" | "batches" | "movements"}) {
+  const {business,locationId,locations,path,refresh,toast} = useWorkspace(); const [tab,setTab] = useState<string>(initialTab),[search,setSearch] = useState(""),[action,setAction] = useState<string | null>(null),[expiry,setExpiry] = useState("known");
   const products = useResource<Product[]>(path("/products")), suppliers = useResource<Supplier[]>(path("/suppliers"));
   const positions = useResource<Position[]>(path("/inventory/positions")), batches = useResource<BatchRow[]>(locationId ? path("/inventory/batches",true) : null), movements = useResource<{movement:Movement}[]>(locationId ? path("/inventory/movements",true) : null);
   const name = (id: string) => products.data?.find(p => p.id === id)?.name ?? `Product ${shortId(id)}`;

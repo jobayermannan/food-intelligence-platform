@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#D48B50",
+        "primary-light": "#E2A774",
+        "primary-dark": "#A6632C",
+        "primary-glow": "rgba(212, 139, 80, 0.18)",
+        obsidian: "#0A0B0D",
+        canvas: "#0E0F13",
+        surface: "#121317",
+        "surface-card": "#15161B",
+        "surface-raised": "#1B1C22",
+        "surface-hover": "#21232B",
+        border: "rgba(255, 255, 255, 0.07)",
+        "border-light": "rgba(255, 255, 255, 0.12)",
+        "border-accent": "rgba(212, 139, 80, 0.28)",
+        "text-headline": "#F5F3EF",
+        "text-body": "#D2CECA",
+        "text-muted": "#96918B",
+        "text-subtle": "#6C6762"
+      },
+      fontFamily: {
+        sans: ["Plus Jakarta Sans", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"]
+      },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.35rem',
+        '4xl': '1.75rem'
+      },
+      boxShadow: {
+        'glass-panel': '0 20px 48px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+        'glass-sidebar': '0 24px 50px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.09)',
+        'glass-btn': '0 4px 16px -2px rgba(212, 139, 80, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+        'inner-glow': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.08)'
+      }
+    }
+  }
+};</script></head><body class="bg-obsidian text-text-body font-sans antialiased selection:bg-primary/30 selection:text-text-headline min-h-screen relative overflow-x-hidden"><div class="fixed inset-0 pointer-events-none z-0 overflow-hidden"><div class="absolute -top-[250px] left-[15%] w-[650px] h-[650px] rounded-full bg-primary/4 blur-[140px]"></div><div class="absolute top-[40%] right-[-100px] w-[500px] h-[500px] rounded-full bg-amber-900/5 blur-[160px]"></div><div class="absolute inset-0 bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div></div><aside class="fixed left-5 top-5 bottom-5 w-72 z-50 flex flex-col bg-[#101115]/85 backdrop-blur-2xl rounded-3xl border border-white/[0.08] shadow-glass-sidebar text-text-headline transition-all duration-300"><div class="p-5 pb-4 flex items-center justify-between border-b border-white/[0.05]"><div class="flex items-center gap-3.5"><div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-surface-raised to-surface-card border border-white/[0.1] flex items-center justify-center text-primary shadow-inner-glow"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span></div><div class="flex flex-col"><span class="font-sans text-[17px] font-bold tracking-tight text-text-headline leading-tight">FoodIntel</span><span class="text-[11px] font-medium tracking-wide text-text-muted">Culinary Operating System</span></div></div><div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/25"><span class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(212,139,80,0.8)]"></span><span class="text-[10px] font-semibold text-primary uppercase tracking-wider">Live</span></div></div><div class="px-4 py-3"><div class="p-3 rounded-2xl bg-[#090A0C]/70 border border-white/[0.06] hover:border-white/[0.12] transition-colors flex items-center justify-between cursor-pointer group"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-xl bg-surface-raised border border-white/[0.06] flex items-center justify-center text-text-muted group-hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">domain</span></div><div class="flex flex-col text-left"><span class="text-[10px] font-semibold tracking-wider uppercase text-text-subtle">Workspace</span><span class="text-[13px] font-semibold text-text-headline truncate max-w-[130px]">The Rustic Hearth</span></div></div><span class="material-symbols-outlined text-text-muted group-hover:text-text-headline text-[18px] transition-colors">unfold_more</span></div></div><div class="flex-1 overflow-y-auto px-4 py-2 space-y-5"><nav class="space-y-4"><div class="space-y-1"><div class="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-text-subtle uppercase">Core Flight</div><a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-medium text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all duration-200" data-path="overview" href="#"><span class="material-symbols-outlined text-[20px] text-text-muted">dashboard</span><span>Executive Overview</span></a></div><div class="space-y-1"><div class="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-text-subtle uppercase">Operations &amp; Stock</div><div class="space-y-1"><div class="flex items-center justify-between px-3 py-2 rounded-xl text-text-headline text-[14px] font-semibold cursor-pointer bg-white/[0.03] border border-white/[0.04]"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[20px] text-primary">inventory_2</span><span>Inventory</span></div><span class="material-symbols-outlined text-[18px] text-primary transform rotate-180 transition-transform">expand_more</span></div><div class="relative ml-5 pl-3 border-l border-white/[0.12] space-y-1 pt-1"><a class="group relative flex items-center gap-2.5 py-2 px-3 rounded-xl text-[14px] font-semibold text-text-headline bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-l-2 border-primary text-[#F3EDE2] shadow-sm transition-all" data-path="stock-positions" href="#"><span class="absolute -left-[13px] w-2.5 h-[1.5px] bg-primary"></span><span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_rgba(212,139,80,0.8)]"></span><span>Stock Positions</span></a><a class="group relative flex items-center gap-2.5 py-1.5 px-3 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="batch-and-expiry" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.15]"></span><span>Batch &amp; Expiry</span></a><a class="group relative flex items-center gap-2.5 py-1.5 px-3 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="movement-ledger" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.15]"></span><span>Movement Ledger</span></a></div></div><div class="space-y-1 pt-2"><div class="flex items-center justify-between px-3 py-2 text-text-muted hover:text-text-headline text-[14px] font-medium cursor-pointer rounded-xl hover:bg-white/[0.04] transition-colors"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[20px] text-text-muted">menu_book</span><span>Catalog</span></div><span class="material-symbols-outlined text-[18px] text-text-subtle">expand_more</span></div><div class="relative ml-5 pl-3 border-l border-white/[0.08] space-y-1"><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="catalog-categories" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Categories</span></a><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="catalog-products" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Products</span></a><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="catalog-suppliers" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Suppliers</span></a></div></div><div class="space-y-1 pt-1"><div class="flex items-center justify-between px-3 py-2 text-text-muted hover:text-text-headline text-[14px] font-medium cursor-pointer rounded-xl hover:bg-white/[0.04] transition-colors"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[20px] text-text-muted">receipt_long</span><span>Sales &amp; Returns</span></div><span class="material-symbols-outlined text-[18px] text-text-subtle">expand_more</span></div><div class="relative ml-5 pl-3 border-l border-white/[0.08] space-y-1"><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="sales-ledger" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Sales Ledger</span></a><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="sales-returns" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Returns</span></a></div></div><div class="space-y-1 pt-1"><div class="flex items-center justify-between px-3 py-2 text-text-muted hover:text-text-headline text-[14px] font-medium cursor-pointer rounded-xl hover:bg-white/[0.04] transition-colors"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[20px] text-text-muted">delete_sweep</span><span>Waste</span></div><span class="material-symbols-outlined text-[18px] text-text-subtle">expand_more</span></div><div class="relative ml-5 pl-3 border-l border-white/[0.08] space-y-1"><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="stock-waste" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Stock Waste</span></a><a class="group relative flex items-center gap-2 py-1.5 px-3 rounded-xl text-[13px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="customer-disposal" href="#"><span class="absolute -left-[13px] w-2.5 h-[1px] bg-white/[0.12]"></span><span>Customer Disposal</span></a></div></div></div><div class="space-y-1 pt-2"><div class="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-text-subtle uppercase">Intelligence</div><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="fefo-watchlist" href="#"><span class="material-symbols-outlined text-[19px] text-text-muted">timer</span><span>FEFO &amp; Watchlist</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="stock-health-analytics" href="#"><span class="material-symbols-outlined text-[19px] text-text-muted">insights</span><span>Stock Health &amp; Analytics</span></a></div><div class="space-y-1 pt-1"><div class="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-text-subtle uppercase">Administration</div><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="team-and-access" href="#"><span class="material-symbols-outlined text-[19px] text-text-muted">group</span><span>Team &amp; Access</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-[13.5px] text-text-muted hover:text-text-headline hover:bg-white/[0.04] transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[19px] text-text-muted">tune</span><span>Settings</span></a></div></nav></div><div class="p-4 pt-3 border-t border-white/[0.06]"><div class="p-3 rounded-2xl bg-[#090A0C]/80 border border-white/[0.06] flex items-center justify-between shadow-inner-glow"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold"><span class="material-symbols-outlined text-[19px]">person</span></div><div class="flex flex-col"><span class="text-[13.5px] font-bold text-text-headline leading-snug">Sarah Jenkins</span><span class="text-[11px] font-medium text-primary">Executive Admin</span></div></div><button class="w-8 h-8 rounded-lg hover:bg-white/[0.08] flex items-center justify-center text-text-muted hover:text-text-headline transition-colors" type="button"><span class="material-symbols-outlined text-[19px]">more_vert</span></button></div></div></aside><div class="pl-[320px] pr-8"><header class="fixed top-5 left-[320px] right-8 h-16 z-40 bg-[#121317]/85 backdrop-blur-2xl rounded-2xl border border-white/[0.08] shadow-glass-panel flex items-center justify-between px-6"><div class="flex items-center gap-5"><div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-surface-card border border-white/[0.07] hover:border-white/[0.12] transition-colors cursor-pointer"><span class="material-symbols-outlined text-primary text-[19px]">store</span><span class="text-[14px] font-semibold text-text-headline">Downtown Kitchen &amp; Pantry</span><span class="font-mono-code text-[11px] font-semibold px-2 py-0.5 rounded-md bg-surface-raised border border-white/[0.08] text-primary">#DKP-01</span><span class="material-symbols-outlined text-text-muted text-[17px]">arrow_drop_down</span></div><div class="hidden xl:flex items-center gap-2"><span class="text-[12px] font-medium px-2.5 py-1 rounded-lg bg-surface-raised/90 border border-white/[0.05] text-text-muted">EST (NY)</span><span class="text-[12px] font-medium px-2.5 py-1 rounded-lg bg-surface-raised/90 border border-white/[0.05] text-text-muted">USD ($)</span><span class="text-[12px] font-medium px-2.5 py-1 rounded-lg bg-surface-raised/90 border border-white/[0.05] text-text-muted">TAX 8.875%</span></div></div><div class="flex items-center gap-3"><div class="relative hidden md:flex items-center"><span class="material-symbols-outlined text-text-muted absolute left-3.5 text-[19px]">search</span><input class="w-80 pl-10 pr-4 py-2 rounded-xl bg-surface-card border border-white/[0.07] text-text-headline text-[13.5px] placeholder:text-text-subtle focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/60 transition-all shadow-inner-glow" placeholder="Search inventory, batches, recipes..." type="text"/></div><button class="w-10 h-10 rounded-xl bg-surface-card border border-white/[0.07] flex items-center justify-center text-text-muted hover:text-text-headline hover:border-white/[0.14] transition-all hover:-translate-y-0.5 shadow-sm" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span></button><button class="w-10 h-10 rounded-xl bg-surface-card border border-white/[0.07] flex items-center justify-center text-text-muted hover:text-text-headline hover:border-white/[0.14] transition-all hover:-translate-y-0.5 shadow-sm" type="button"><span class="material-symbols-outlined text-[20px]">history</span></button><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/25 to-primary/10 border border-primary/40 flex items-center justify-center text-primary font-bold text-[13.5px] shadow-sm">SJ</div></div></header><main class="w-full pt-28 pb-14"><div class="flex flex-col w-full space-y-7">
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
+<div class="flex flex-col space-y-2.5 max-w-3xl">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(212,139,80,0.8)]"></span>
+<span class="text-[12px] font-bold tracking-widest uppercase text-primary">Executive Intelligence</span>
+<span class="text-white/20">•</span>
+<span class="text-[12.5px] font-medium tracking-wide text-text-muted">Floor Operations Ledger</span>
+</div>
+<h1 class="font-sans text-[34px] lg:text-[40px] font-extrabold text-text-headline tracking-tight leading-tight">Executive Culinary Intelligence &amp; Floor Operations</h1>
+<p class="text-[14.5px] text-text-muted leading-relaxed">
+Location: <span class="text-text-headline font-semibold">Downtown Kitchen &amp; Pantry</span> (<span class="font-mono-code text-[12.5px] text-primary">#DKP-01</span>) • America/New_York (EST) • <span class="text-primary font-medium">Real-time FEFO protocols active</span>
+</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-surface-raised hover:bg-surface-hover border border-white/[0.08] hover:border-white/[0.15] text-text-headline text-[14px] font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[19px] text-text-muted group-hover:text-primary transition-colors">delete_outline</span>
+<span>Record Waste</span>
+</button>
+<button class="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-surface-raised hover:bg-surface-hover border border-white/[0.08] hover:border-white/[0.15] text-text-headline text-[14px] font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[19px] text-text-muted group-hover:text-primary transition-colors">percent</span>
+<span>Discounts</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary-light text-[#2E1500] font-sans text-[14px] font-bold shadow-glass-btn hover:brightness-105 active:scale-[0.98] transition-all duration-200 hover:-translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_box</span>
+<span>Record Receiving</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<div class="lg:col-span-7 flex flex-col p-7 rounded-3xl bg-[#131418]/85 backdrop-blur-xl border border-white/[0.08] shadow-glass-panel space-y-6 relative overflow-hidden">
+<div class="absolute -top-28 -right-28 w-96 h-96 rounded-full bg-primary/6 blur-3xl pointer-events-none"></div>
+<div class="flex items-start justify-between relative z-10">
+<div class="flex flex-col space-y-1">
+<span class="text-[11.5px] font-bold uppercase tracking-wider text-primary">Inventory Foundation &amp; Valuation</span>
+<h2 class="text-[22px] font-bold text-text-headline tracking-tight">Physical Inventory Balance &amp; Valuation</h2>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-raised/90 border border-primary/25 text-primary text-[12.5px] font-semibold shadow-inner-glow">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Owner/Admin Verified</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+<div class="p-5 rounded-2xl bg-surface-card/90 border border-white/[0.06] hover:border-white/[0.12] transition-colors flex flex-col justify-between shadow-inner-glow">
+<div class="flex items-center justify-between text-text-muted mb-3">
+<span class="text-[13px] font-semibold tracking-wide uppercase text-text-subtle">Current Stockholding</span>
+<div class="w-8 h-8 rounded-lg bg-surface-raised flex items-center justify-center text-text-muted">
+<span class="material-symbols-outlined text-[19px]">inventory_2</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<div class="text-[34px] font-extrabold text-text-headline tracking-tight tabular-nums leading-none">4,280 <span class="text-[15px] text-text-muted font-normal">Base Units</span></div>
+<div class="text-[14px] text-text-body">Spread across <strong class="text-primary font-bold">64 Active SKUs</strong></div>
+</div>
+</div>
+<div class="p-5 rounded-2xl bg-surface-card/90 border border-white/[0.06] hover:border-white/[0.12] transition-colors flex flex-col justify-between shadow-inner-glow">
+<div class="flex items-center justify-between text-text-muted mb-3">
+<span class="text-[13px] font-semibold tracking-wide uppercase text-text-subtle">Acquisition Valuation</span>
+<div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[19px]">account_balance_wallet</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<div class="text-[34px] font-extrabold text-primary tracking-tight tabular-nums leading-none">$38,420<span class="text-[22px] font-semibold text-primary-light">.50</span></div>
+<div class="text-[14px] text-text-body">Accounted strict acquisition base</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+<div class="p-5 rounded-2xl bg-[#0B0C0F]/70 border border-white/[0.06] flex flex-col space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="text-[11.5px] uppercase tracking-wider text-text-subtle font-bold">All-Time Net Realization</span>
+<span class="px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-primary tabular-nums text-[12px] font-bold">+12.4% MoM</span>
+</div>
+<div class="text-[26px] font-extrabold text-text-headline tabular-nums">$142,850.00</div>
+<span class="text-[13.5px] text-text-muted">Gross $148,200.00 minus tracked returns</span>
+<div class="w-full h-2 rounded-full bg-surface-raised overflow-hidden mt-1.5">
+<div class="h-full bg-gradient-to-r from-primary to-primary-light rounded-full" style="width: 86%;"></div>
+</div>
+</div>
+<div class="p-5 rounded-2xl bg-[#0B0C0F]/70 border border-white/[0.06] flex flex-col space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="text-[11.5px] uppercase tracking-wider text-text-subtle font-bold">All-Time Waste Drag</span>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-raised border border-white/[0.08] text-text-body tabular-nums text-[12px] font-semibold">Target &lt;2.0%</span>
+</div>
+<div class="text-[26px] font-extrabold text-text-headline tabular-nums">$2,180.40</div>
+<span class="text-[13.5px] text-text-muted">1.47% Gross Drag <span class="text-primary font-semibold">(Optimal Margin Control)</span></span>
+<div class="w-full h-2 rounded-full bg-surface-raised overflow-hidden mt-1.5">
+<div class="h-full bg-text-muted/70 rounded-full" style="width: 24%;"></div>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 text-text-muted border-t border-white/[0.06] relative z-10">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px] text-primary">data_saver_on</span>
+<span class="text-[13.5px] text-text-muted">Data reflects loaded snapshot records across active location — not live streaming.</span>
+</div>
+<span class="text-[11.5px] text-text-headline font-semibold tracking-wider uppercase px-2.5 py-1 rounded-md bg-surface-raised border border-white/[0.06]">Sync: 12m ago</span>
+</div>
+</div>
+<div class="lg:col-span-5 flex flex-col p-7 rounded-3xl bg-[#131418]/85 backdrop-blur-xl border border-white/[0.08] shadow-glass-panel space-y-5 relative">
+<div class="flex items-center justify-between pb-1">
+<div class="flex flex-col space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-[11.5px] font-bold uppercase tracking-wider text-primary">Priority Watchlist</span>
+<span class="w-2 h-2 rounded-full bg-[#E57373] animate-pulse shadow-[0_0_8px_rgba(229,115,115,0.8)]"></span>
+</div>
+<h2 class="text-[22px] font-bold text-text-headline tracking-tight">FEFO Priority Action Queue</h2>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-raised border border-white/[0.08] text-text-headline text-[13px] font-semibold shadow-inner-glow">
+<span class="text-primary font-bold">14</span> Batches Flagged
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2.5 text-center">
+<div class="p-3 rounded-2xl bg-[#E57373]/10 border border-[#E57373]/25 text-[#FFB4AB]">
+<div class="text-[20px] font-extrabold tabular-nums leading-tight">3</div>
+<div class="text-[11px] font-bold tracking-wider uppercase mt-0.5">Expired</div>
+</div>
+<div class="p-3 rounded-2xl bg-primary/15 border border-primary/30 text-primary-light">
+<div class="text-[20px] font-extrabold tabular-nums leading-tight">5</div>
+<div class="text-[11px] font-bold tracking-wider uppercase mt-0.5">&lt;24h Critical</div>
+</div>
+<div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[#FDB87E]">
+<div class="text-[20px] font-extrabold tabular-nums leading-tight">6</div>
+<div class="text-[11px] font-bold tracking-wider uppercase mt-0.5">&lt;72h Warning</div>
+</div>
+</div>
+<div class="space-y-3 pt-1">
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:border-white/[0.14] transition-all duration-200 flex flex-col space-y-2.5 shadow-sm">
+<div class="flex items-start justify-between gap-2">
+<div class="flex flex-col">
+<span class="text-[15.5px] text-text-headline font-bold">Wagyu Beef Patties 8oz</span>
+<span class="text-[12.5px] text-text-muted mt-0.5"><span class="font-mono-code text-[11.5px] text-primary">SKU: BEEF-TEND</span> • Walk-In Freezer B</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-primary/15 border border-primary/30 text-primary-light text-[11px] font-bold uppercase tracking-wider shrink-0">
+CRITICAL: 14h Left
+</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+<div class="text-[13.5px] text-text-body">
+Stock: <strong class="text-text-headline font-bold tabular-nums">45 kg</strong> • Acq: <span class="text-primary font-bold tabular-nums">$675.00</span>
+</div>
+<button class="px-3.5 py-1.5 rounded-xl bg-surface-raised hover:bg-primary hover:text-[#2E1500] text-text-headline text-[13px] font-bold transition-all duration-200 shadow-sm" type="button">
+Baseline Discount
+</button>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:border-white/[0.14] transition-all duration-200 flex flex-col space-y-2.5 shadow-sm">
+<div class="flex items-start justify-between gap-2">
+<div class="flex flex-col">
+<span class="text-[15.5px] text-text-headline font-bold">Brioche Artisan Buns</span>
+<span class="text-[12.5px] text-text-muted mt-0.5"><span class="font-mono-code text-[11.5px] text-primary">SKU: BAKE-SOUR</span> • Dry Storage Bay 3</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-[#E57373]/15 border border-[#E57373]/30 text-[#FFB4AB] text-[11px] font-bold uppercase tracking-wider shrink-0">
+EXPIRED: 6h ago
+</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+<div class="text-[13.5px] text-text-body">
+Stock: <strong class="text-text-headline font-bold tabular-nums">120 pack</strong> • Acq: <span class="text-[#FFB4AB] font-bold tabular-nums">$168.00</span>
+</div>
+<button class="px-3.5 py-1.5 rounded-xl bg-[#E57373]/20 hover:bg-[#E57373] hover:text-[#3B070B] text-[#FFB4AB] text-[13px] font-bold transition-all duration-200 shadow-sm" type="button">
+Dispose to Waste
+</button>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:border-white/[0.14] transition-all duration-200 flex flex-col space-y-2.5 shadow-sm">
+<div class="flex items-start justify-between gap-2">
+<div class="flex flex-col">
+<span class="text-[15.5px] text-text-headline font-bold">Organic Whole Milk 3.8%</span>
+<span class="text-[12.5px] text-text-muted mt-0.5"><span class="font-mono-code text-[11.5px] text-primary">SKU: DAIR-CRM</span> • Dairy Cooler 1</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-raised border border-white/[0.08] text-text-body text-[11px] font-semibold uppercase tracking-wider shrink-0">
+WARNING: 36h Left
+</span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+<div class="text-[13.5px] text-text-body">
+Stock: <strong class="text-text-headline font-bold tabular-nums">28 L</strong> • Acq: <span class="text-text-headline font-bold tabular-nums">$84.00</span>
+</div>
+<button class="px-3.5 py-1.5 rounded-xl bg-surface-raised hover:bg-surface-hover text-text-headline text-[13px] font-bold transition-all duration-200 shadow-sm" type="button">
+Expedite Prep
+</button>
+</div>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-gradient-to-r from-surface-raised/95 via-surface-card to-[#0B0C0F] border border-white/[0.09] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-glass-panel">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0 shadow-inner-glow">
+<span class="material-symbols-outlined text-[22px]">rule</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[14.5px] font-bold text-text-headline">Baseline Expiry Markdown Rule</span>
+<span class="text-[13px] text-text-muted leading-snug">Automated 20% discount proposal on 5 batches approaching &lt;24h threshold to protect kitchen gross margin (<span class="text-primary font-bold tabular-nums">$410.00</span> est. saved).</span>
+</div>
+</div>
+<button class="shrink-0 px-4 py-2.5 rounded-xl bg-primary text-[#2E1500] text-[13px] font-extrabold hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-md" type="button">
+Review Baseline Proposal
+</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<div class="lg:col-span-7 flex flex-col p-7 rounded-3xl bg-[#131418]/85 backdrop-blur-xl border border-white/[0.08] shadow-glass-panel space-y-5">
+<div class="flex items-center justify-between">
+<div class="flex flex-col space-y-1">
+<span class="text-[11.5px] font-bold uppercase tracking-wider text-primary">Floor Throughput</span>
+<h3 class="text-[22px] font-bold text-text-headline tracking-tight">Recent Completed Sales &amp; Server-Allocated FEFO Batches</h3>
+</div>
+<span class="text-[11.5px] font-bold text-primary uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 border border-primary/25">Active Shifts</span>
+</div>
+<div class="space-y-2.5 pt-1">
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:bg-surface-card hover:border-white/[0.12] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm group">
+<div class="flex items-center gap-3.5">
+<div class="w-11 h-11 rounded-2xl bg-surface-raised border border-white/[0.06] flex items-center justify-center text-primary group-hover:scale-105 transition-transform shrink-0">
+<span class="material-symbols-outlined text-[22px]">table_restaurant</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2.5">
+<span class="text-[15px] font-bold text-text-headline"><span class="font-mono-code text-[13.5px] text-primary">#SL-4921</span></span>
+<span class="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-surface-raised border border-white/[0.05] text-text-muted">Bar Table 04</span>
+</div>
+<span class="text-[13.5px] text-text-muted mt-0.5">Wagyu Sliders (4 unit), Brioche Buns (4 unit)</span>
+</div>
+</div>
+<div class="flex md:flex-col items-end justify-between w-full md:w-auto">
+<span class="text-[16px] text-text-headline font-extrabold tabular-nums">$124.50 Net</span>
+<span class="font-mono-code text-[12px] text-primary font-medium tracking-wide">Batches #B-9021 • #B-7712</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:bg-surface-card hover:border-white/[0.12] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm group">
+<div class="flex items-center gap-3.5">
+<div class="w-11 h-11 rounded-2xl bg-surface-raised border border-white/[0.06] flex items-center justify-center text-primary-light group-hover:scale-105 transition-transform shrink-0">
+<span class="material-symbols-outlined text-[22px]">takeout_dining</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2.5">
+<span class="text-[15px] font-bold text-text-headline"><span class="font-mono-code text-[13.5px] text-primary">#SL-4920</span></span>
+<span class="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-surface-raised border border-white/[0.05] text-text-muted">Counter Takeout</span>
+</div>
+<span class="text-[13.5px] text-text-muted mt-0.5">Matcha Latte (6 unit), Whole Milk (2 L)</span>
+</div>
+</div>
+<div class="flex md:flex-col items-end justify-between w-full md:w-auto">
+<span class="text-[16px] text-text-headline font-extrabold tabular-nums">$42.00 Net</span>
+<span class="font-mono-code text-[12px] text-text-body font-medium tracking-wide">Batch #B-8834</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:bg-surface-card hover:border-white/[0.12] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm group">
+<div class="flex items-center gap-3.5">
+<div class="w-11 h-11 rounded-2xl bg-surface-raised border border-white/[0.06] flex items-center justify-center text-primary group-hover:scale-105 transition-transform shrink-0">
+<span class="material-symbols-outlined text-[22px]">room_service</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2.5">
+<span class="text-[15px] font-bold text-text-headline"><span class="font-mono-code text-[13.5px] text-primary">#SL-4919</span></span>
+<span class="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-surface-raised border border-white/[0.05] text-text-muted">Dining Room 12</span>
+</div>
+<span class="text-[13.5px] text-text-muted mt-0.5">Wagyu Ribeye (6 unit), Truffle Butter (300 g)</span>
+</div>
+</div>
+<div class="flex md:flex-col items-end justify-between w-full md:w-auto">
+<span class="text-[16px] text-text-headline font-extrabold tabular-nums">$218.40 Net</span>
+<span class="font-mono-code text-[12px] text-primary font-medium tracking-wide">Batch #B-8910</span>
+</div>
+</div>
+<div class="p-4 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] hover:bg-surface-card hover:border-white/[0.12] transition-all duration-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm group">
+<div class="flex items-center gap-3.5">
+<div class="w-11 h-11 rounded-2xl bg-surface-raised border border-white/[0.06] flex items-center justify-center text-text-muted group-hover:scale-105 transition-transform shrink-0">
+<span class="material-symbols-outlined text-[22px]">lunch_dining</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2.5">
+<span class="text-[15px] font-bold text-text-headline"><span class="font-mono-code text-[13.5px] text-primary">#SL-4918</span></span>
+<span class="text-[11.5px] font-semibold px-2 py-0.5 rounded-md bg-surface-raised border border-white/[0.05] text-text-muted">Online Catering #88</span>
+</div>
+<span class="text-[13.5px] text-text-muted mt-0.5">Artisan Bread Assortment (40 unit)</span>
+</div>
+</div>
+<div class="flex md:flex-col items-end justify-between w-full md:w-auto">
+<span class="text-[16px] text-text-headline font-extrabold tabular-nums">$540.00 Net</span>
+<span class="font-mono-code text-[12px] text-text-body font-medium tracking-wide">Batches #B-7711 • #B-7708</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2 text-text-muted border-t border-white/[0.06]">
+<span class="text-[13.5px]">Showing 5 of 500 loaded transactions</span>
+<a class="inline-flex items-center gap-2 text-[13.5px] font-bold text-primary hover:text-primary-light transition-colors group" href="#">
+<span>Full Sales &amp; Returns Ledger</span>
+<span class="material-symbols-outlined text-[17px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="lg:col-span-5 flex flex-col p-7 rounded-3xl bg-[#131418]/85 backdrop-blur-xl border border-white/[0.08] shadow-glass-panel space-y-5">
+<div class="flex items-center justify-between">
+<div class="flex flex-col space-y-1">
+<span class="text-[11.5px] font-bold uppercase tracking-wider text-primary">Network Optimization</span>
+<h3 class="text-[22px] font-bold text-text-headline tracking-tight">Inter-Location &amp; Cold-Line</h3>
+</div>
+<span class="material-symbols-outlined text-primary text-[24px]">hub</span>
+</div>
+<div class="p-5 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] flex flex-col space-y-3.5 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 text-text-headline text-[15.5px] font-bold">
+<span class="material-symbols-outlined text-primary text-[20px]">sync_alt</span>
+<span>Uptown Kitchen Shortage Alert</span>
+</div>
+<span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-primary uppercase">Surplus Link</span>
+</div>
+<p class="text-[13.5px] text-text-muted leading-relaxed">
+Uptown location is depleted on <strong class="text-text-headline font-bold">Wagyu Patties</strong>. Downtown hub has high-risk surplus (<span class="text-primary font-bold tabular-nums">30 kg ready</span>) capable of instant absorption.
+</p>
+<div class="flex items-center justify-between pt-1 border-t border-white/[0.04]">
+<div class="flex flex-col">
+<span class="text-[11px] text-text-subtle uppercase font-bold tracking-wider">Transit Route</span>
+<span class="text-[14px] font-bold text-text-headline">Downtown → Uptown (18 min)</span>
+</div>
+<button class="px-4 py-2 rounded-xl bg-surface-raised hover:bg-surface-hover border border-white/[0.08] text-primary text-[13px] font-bold transition-all duration-200 shadow-sm" type="button">
+Initiate Batch Transfer
+</button>
+</div>
+</div>
+<div class="p-5 rounded-2xl bg-[#0B0C0F]/80 border border-white/[0.06] flex flex-col space-y-3 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="text-[11.5px] font-bold uppercase tracking-wider text-primary">HACCP Telemetry Stream</span>
+<div class="flex items-center gap-1.5 text-primary text-[12.5px] font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span>Live Probes</span>
+</div>
+</div>
+<div class="space-y-2.5 pt-0.5">
+<div class="p-3.5 rounded-xl bg-surface-card border border-white/[0.05] flex items-center justify-between">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-lg bg-surface-raised flex items-center justify-center text-text-muted">
+<span class="material-symbols-outlined text-[20px]">ac_unit</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[14.5px] font-bold text-text-headline">Walk-in Cooler 1</span>
+<span class="text-[12.5px] text-primary font-medium">Compliant • Humidity 68%</span>
+</div>
+</div>
+<div class="text-[22px] font-extrabold text-text-headline tabular-nums">34.2°F</div>
+</div>
+<div class="p-3.5 rounded-xl bg-surface-card border border-white/[0.05] flex items-center justify-between">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-lg bg-surface-raised flex items-center justify-center text-text-muted">
+<span class="material-symbols-outlined text-[20px]">kitchen</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[14.5px] font-bold text-text-headline">Walk-In Freezer B</span>
+<span class="text-[12.5px] text-primary font-medium">Compliant • Deep Freeze</span>
+</div>
+</div>
+<div class="text-[22px] font-extrabold text-text-headline tabular-nums">-2.4°F</div>
+</div>
+</div>
+</div>
+<div class="relative w-full h-36 rounded-2xl overflow-hidden border border-white/[0.08] shadow-md group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Intimate chef expediting counter in a Michelin-starred kitchen, copper pans and precision culinary plating with warm amber and deep slate tones in atmospheric lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhnOv8k0PoFKYhMu9xjnqYwQ3hAcIZE8fwHk5Gi-GrJ1m0yx0FEcXNQheP85zpwa41FMbw-CDPwWO2wNON0xrMece7jkiikBDUCNLQxa8O4hQF40bLnKMhPdIYP72wxWS-_aNn-fzTBClGAJGkFoC8NdOrDPISQvDxD7aywEslds8IiNl-IIMhtRiHEAqu2qi-zANbhGU1LaRC4oc7eahngl7uBK0OgxQk0Yk8C-DxbeNy-N9hvCn0')">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0B0C0F] via-[#0B0C0F]/60 to-transparent p-4 flex flex-col justify-end">
+<span class="text-[11px] font-bold uppercase tracking-wider text-primary">Floor Station Ready</span>
+<span class="text-[14.5px] font-semibold text-text-headline">Chef de Cuisine active on pass service line</span>
+</div>
+</div>
+</div>
+</div>
+</div></main></div>
+</body></html>

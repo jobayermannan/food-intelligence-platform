@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { readWorkspacePreference, saveWorkspacePreference, selectBusinessId, selectLocationId } from "../src/lib/workspace-preference";
+import { readWorkspacePreference, saveWorkspacePreference, selectBusinessId, selectLocationId, workspaceBootPending } from "../src/lib/workspace-preference";
 
 function storage() {
   const values = new Map<string,string>();
@@ -23,4 +23,11 @@ test("saved selections must still be available and active", () => {
   assert.equal(selectLocationId(locations,"old"),"dhanmondi");
   assert.equal(selectLocationId(locations,"inaccessible"),"dhanmondi");
   assert.equal(selectLocationId([{id:"old",archivedAt:"2026-01-01"}],"old"),"");
+});
+
+test("initial shell waits for session and workspace restoration, then stays available", () => {
+  assert.equal(workspaceBootPending(false,false,false,false),true);
+  assert.equal(workspaceBootPending(true,true,false,false),true);
+  assert.equal(workspaceBootPending(true,true,false,true),false);
+  assert.equal(workspaceBootPending(true,false,true,false),false);
 });

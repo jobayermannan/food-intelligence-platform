@@ -6,8 +6,8 @@ import { manages, money } from "@/lib/domain";
 import type { Category, Product, Supplier } from "@/lib/models";
 import { useResource, useWorkspace } from "@/components/workspace";
 import { ActionForm, Badge, Button, ErrorBox, Field, LimitNote, Loading, Modal, PageTitle, Panel, Select, Table, optional, value } from "@/components/ui";
-export function Catalog() {
-  const {business,path,refresh,toast} = useWorkspace(); const [tab,setTab] = useState("products"), [search,setSearch] = useState(""), [edit,setEdit] = useState<Product | Supplier | "new" | null>(null);
+export function Catalog({initialTab = "products"}: {initialTab?: "products" | "categories" | "suppliers"}) {
+  const {business,path,refresh,toast} = useWorkspace(); const [tab,setTab] = useState<string>(initialTab), [search,setSearch] = useState(""), [edit,setEdit] = useState<Product | Supplier | "new" | null>(null);
   const products = useResource<Product[]>(path("/products")), categories = useResource<Category[]>(path("/categories")), suppliers = useResource<Supplier[]>(path("/suppliers"));
   const current = tab === "products" ? products : tab === "categories" ? categories : suppliers;
   const filtered: (Product | Category | Supplier)[] = (current.data ?? []).filter(row => `${row.name} ${"sku" in row ? row.sku : ""}`.toLowerCase().includes(search.toLowerCase()));

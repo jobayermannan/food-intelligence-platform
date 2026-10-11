@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowDownRight, CircleCheck, Leaf, Sprout } from "lucide-react";
+import { ArrowDownRight, CircleCheck, Leaf, PlayCircle, Sprout } from "lucide-react";
 import { api } from "@/lib/api";
 import { useSession } from "./session";
 import { ActionForm, Field, value } from "./ui";
@@ -13,6 +13,13 @@ const content: Record<AuthMode,{title:string;description:string;button:string}> 
   "forgot-password":{title:"Let’s get you back in.",description:"We’ll send reset instructions if an eligible account exists.",button:"Send reset instructions"},
   "reset-password":{title:"A fresh start.",description:"Paste your emailed reset token and choose a new password.",button:"Reset password"},
 };
+// This stays unmounted until a dedicated seeded demo tenant and secure sign-in flow exist.
+export function DemoWorkspaceCta({onExplore}: {onExplore: () => void}) {
+  return <div className="demo-workspace-cta">
+    <button type="button" className="button secondary" onClick={onExplore}><PlayCircle size={16} aria-hidden="true"/>Explore Demo Workspace</button>
+    <p>No setup required · Sample data</p>
+  </div>;
+}
 export function AuthScreen({mode}: {mode:AuthMode}) {
   const {login} = useSession(), [done,setDone] = useState(false), copy = content[mode];
   return <div className="auth-shell"><aside className="auth-story"><Link className="brand" href="/login"><span className="brand-mark"><Sprout size={25}/></span><span>food<span className="brand-light">intelligence</span></span></Link><div className="auth-story-content"><div className="eyebrow">EVERY INGREDIENT COUNTS</div><h1>Less waste.<br/>More possibility.</h1><p>Bring your stock, sales and team together.<br/>See the bigger picture in every little detail.</p><div className="food-illustration" aria-hidden="true"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="illustration-leaf"><Leaf size={95} strokeWidth={1}/></div><div className="illustration-label"><span className="live-dot"/> From stock to insight <ArrowDownRight size={18}/></div><span className="seed seed-one"/><span className="seed seed-two"/></div></div><small>Built for food businesses. Designed for everyday clarity.</small></aside>
