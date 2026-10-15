@@ -30,6 +30,7 @@ services:
       DATABASE_URL: postgres://food:food_dev_only@postgres:5432/food_intelligence
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3001}
+      APP_ORIGINS: ${APP_ORIGINS:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       SMTP_HOST: mailpit
       SMTP_PORT: 1025

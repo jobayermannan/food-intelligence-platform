@@ -22,6 +22,7 @@ import {
 import { Public } from "../common/public.decorator";
 import { AuthedRequest } from "../common/principal";
 import { authConfig } from "../config";
+import { isAllowedOrigin } from "../origins";
 
 @ApiTags("auth")
 @Controller("api/v1/auth")
@@ -37,7 +38,7 @@ export class AuthController {
     });
   }
   private origin(req: Request) {
-    if (req.headers.origin !== authConfig().origin)
+    if (!isAllowedOrigin(req.headers.origin))
       throw new UnauthorizedException("Origin required");
   }
 

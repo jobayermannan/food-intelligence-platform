@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
+import { appOrigins } from "./origins";
 
 loadEnv({ path: resolve(process.cwd(), "../../.env") });
 loadEnv();
@@ -18,7 +19,7 @@ export function authConfig() {
     secret,
     issuer: process.env.JWT_ISSUER ?? "food-intelligence-platform",
     audience: process.env.JWT_AUDIENCE ?? "food-intelligence-api",
-    origin: process.env.APP_ORIGIN ?? "http://localhost:3000",
+    origins: appOrigins(),
     cookieSecure: process.env.COOKIE_SECURE !== "false",
   };
 }

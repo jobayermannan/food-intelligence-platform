@@ -13,6 +13,7 @@ import nodemailer from "nodemailer";
 import { DatabaseService } from "../database/database.service";
 import { users, sessions, actionTokens } from "../database/schema";
 import { authConfig } from "../config";
+import { mailFrom, smtpTransportOptions } from "../smtp";
 import { RegisterDto } from "./auth.dto";
 
 const hash = (value: string) =>
@@ -46,13 +47,9 @@ export class AuthService {
   }
 
   private async mail(email: string, subject: string, token: string) {
-    const transport = nodemailer.createTransport({
-      host: process.env.SMTP_HOST ?? "localhost",
-      port: Number(process.env.SMTP_PORT ?? 1025),
-      secure: false,
-    });
+    const transport = nodemailer.createTransport(smtpTransportOptions());
     await transport.sendMail({
-      from: process.env.MAIL_FROM ?? "development@food-intelligence.local",
+      from: mailFrom(),
       to: email,
       subject,
       text: `Food Intelligence Platform ${subject.toLowerCase()} token: ${token}\nUse this token in the matching API action.`,
