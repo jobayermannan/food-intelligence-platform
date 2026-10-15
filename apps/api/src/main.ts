@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
+import type { Request, Response } from "express";
 import { AppModule } from "./app.module";
 import { authConfig } from "./config";
 import { trustProxyHops } from "./proxy";
@@ -44,6 +45,22 @@ export async function createApp() {
   }
   app.enableShutdownHooks();
   return app;
+}
+
+let serverlessApp: ReturnType<typeof createApp> | undefined;
+
+/**
+ * Vercel invokes the default export for every request.  Cache the initialized
+ * Nest application at module scope so warm serverless invocations reuse it.
+ */
+export default async function handler(req: Request, res: Response) {
+  serverlessApp ??= createApp().then(async (app) => {
+    await app.init();
+    return app;
+  });
+
+  const app = await serverlessApp;
+  return app.getHttpAdapter().getInstance()(req, res);
 }
 
 if (require.main === module)
