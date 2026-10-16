@@ -43,6 +43,13 @@
       "when": 1790847782376,
       "tag": "0005_organic_zarda",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792130400000,
+      "tag": "0006_recruiter_demo",
+      "breakpoints": true
     }
   ]
 }

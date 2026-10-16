@@ -8,6 +8,7 @@ import { InventoryModule } from "./inventory/inventory.module";
 import { SalesModule } from "./sales/sales.module";
 import { WasteModule } from "./waste/waste.module";
 import { InsightsModule } from "./insights/insights.module";
+import { DemoModule } from "./demo/demo.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { InsightsModule } from "./insights/insights.module";
     SalesModule,
     WasteModule,
     InsightsModule,
+    DemoModule,
   ],
   controllers: [HealthController],
 })

@@ -1,6 +1,6 @@
 export type Role = "OWNER" | "ADMIN" | "STAFF" | "VIEWER";
 export type Unit = "piece" | "kg" | "gram" | "litre" | "ml" | "package";
-export interface User { id: string; email: string; displayName: string }
+export interface User { id: string; email: string; displayName: string; isDemo?: boolean }
 export interface Business { id: string; name: string; role: Role; timezone: string; currency: string; defaultTaxRate: string; expiryCriticalHours: number; expiryWarningHours: number }
 export interface Location { id: string; code: string; name: string; archivedAt: string | null }
 export interface Category { id: string; name: string }

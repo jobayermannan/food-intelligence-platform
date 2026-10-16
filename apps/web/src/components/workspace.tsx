@@ -33,6 +33,11 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
   const availableBusinesses = businessesUserId === userId ? businesses : [];
   const business = availableBusinesses.find(b => b.id === businessId), location = business ? locations.find(l => l.id === locationId) : undefined;
   const refresh = useCallback(() => setRevision(v => v+1), []);
+  const resetDemo = async () => {
+    if (!window.confirm("Reset the shared demo workspace? Your demo changes will be discarded and the fictional sample data will be restored.")) return;
+    await api("/demo/reset", {method:"POST"});
+    refresh(); setNotification("Demo workspace reset. Sample data has been restored.");
+  };
   useEffect(() => { if (ready && !user && !sessionError) router.replace("/login"); },[ready,user,sessionError,router]);
   useEffect(() => {
     if (!userId) return;
@@ -110,6 +115,7 @@ export function WorkspaceShell({children}: {children: ReactNode}) {
       onCreateBusiness={() => setCreate(true)}
       onRefresh={refresh}
       onLogout={() => void logout().catch(e => setError(e.message))}
+      onResetDemo={() => void resetDemo().catch(e => setError(e.message))}
       notification={notification}
       onDismissNotification={() => setNotification("")}
     >{content}</ShellView>

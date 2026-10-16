@@ -64,6 +64,7 @@ describe("Backend 2.0 MVP against PostgreSQL", () => {
     process.env.JWT_SECRET = "integration-test-secret-longer-than-32-bytes";
     process.env.COOKIE_SECURE = "false";
     process.env.APP_ORIGIN = "http://localhost:3000";
+    process.env.APP_ORIGINS = "http://localhost:3000";
     app = await createApp();
     await app.init();
     database = app.get(DatabaseService);

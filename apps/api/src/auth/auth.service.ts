@@ -153,6 +153,20 @@ export class AuthService {
     return { accessToken: this.access(user.id, session.id), refreshToken };
   }
 
+  async issueDemoSession(userId: string) {
+    const refreshToken = secretToken();
+    const [session] = await this.database.db
+      .insert(sessions)
+      .values({
+        userId,
+        tokenHash: hash(refreshToken),
+        familyId: randomUUID(),
+        expiresAt: new Date(Date.now() + 4 * 60 * 60 * 1000),
+      })
+      .returning();
+    return { accessToken: this.access(userId, session.id), refreshToken };
+  }
+
   private access(userId: string, sessionId: string) {
     const cfg = authConfig();
     return jwt.sign({ sid: sessionId }, cfg.secret, {
@@ -285,6 +299,7 @@ export class AuthService {
         id: users.id,
         email: users.email,
         displayName: users.displayName,
+        isDemo: users.isDemo,
       })
       .from(users)
       .where(eq(users.id, userId));

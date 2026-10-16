@@ -32,6 +32,7 @@ type Props = {
   onCreateBusiness: () => void;
   onRefresh: () => void;
   onLogout: () => void;
+  onResetDemo: () => void;
   children: ReactNode;
   notification: string;
   onDismissNotification: () => void;
@@ -56,7 +57,7 @@ function NavigationGroup({item, pathname, close}: {item: NavGroup; pathname: str
   </div>;
 }
 
-export function ShellView({user,business,businesses,locations,businessId,locationId,onBusinessChange,onLocationChange,onCreateBusiness,onRefresh,onLogout,children,notification,onDismissNotification}: Props) {
+export function ShellView({user,business,businesses,locations,businessId,locationId,onBusinessChange,onLocationChange,onCreateBusiness,onRefresh,onLogout,onResetDemo,children,notification,onDismissNotification}: Props) {
   const pathname = usePathname();
   const [mobile, setMobile] = useState(false);
   const sidebar = useRef<HTMLElement>(null);
@@ -106,10 +107,10 @@ export function ShellView({user,business,businesses,locations,businessId,locatio
       <div className="workspace-picker">
         <span className="tiny-label">Workspace</span>
         <PopoverSelect label="Active workspace" value={businessId} disabled={!businesses.length} options={businesses.map(row => ({value:row.id,label:row.name}))} onChange={selected => {onBusinessChange(selected); close();}} compact/>
-        <button type="button" className="text-button" onClick={() => {onCreateBusiness(); close();}}><Plus size={14} aria-hidden="true"/> New business</button>
+        {!user.isDemo && <button type="button" className="text-button" onClick={() => {onCreateBusiness(); close();}}><Plus size={14} aria-hidden="true"/> New business</button>}
       </div>
       <nav aria-label="Main navigation" className="sidebar-nav">
-        {business && navigation.map(section => {
+        {business && navigation.filter(section => !user.isDemo || section.label !== "Administration").map(section => {
           const visible = section.items.filter(item => canSeeNavigation(item, business.role));
           if (!visible.length) return null;
           return <div className="nav-section" key={section.label}>
@@ -128,6 +129,7 @@ export function ShellView({user,business,businesses,locations,businessId,locatio
         })}
       </nav>
       <div className="sidebar-bottom">
+        {user.isDemo && <button type="button" className="text-button" onClick={onResetDemo}><RefreshCw size={15} aria-hidden="true"/> Reset demo</button>}
         <Link href="/account" onClick={close} className={`account-link${pathname === "/account" ? " active" : ""}`} aria-current={pathname === "/account" ? "page" : undefined}>
           <span className="avatar" aria-hidden="true">{initials}</span><span className="account-copy"><strong>{user.displayName}</strong><small>{business?.role ?? "Your account"}</small></span>
         </Link>

@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { useRouter } from "next/navigation";
 import { api, refreshSession, setToken } from "@/lib/api";
 import type { User } from "@/lib/models";
-type Session = {user: User | null; ready: boolean; error: string | null; login: (email: string, password: string) => Promise<void>; logout: (all?: boolean) => Promise<void>; restore: () => void};
+type Session = {user: User | null; ready: boolean; error: string | null; login: (email: string, password: string) => Promise<void>; startDemo: () => Promise<void>; logout: (all?: boolean) => Promise<void>; restore: () => void};
 const Context = createContext<Session | null>(null);
 export function SessionProvider({children}: {children: ReactNode}) {
   const [user, setUser] = useState<User | null>(null), [ready, setReady] = useState(false), [error, setError] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export function SessionProvider({children}: {children: ReactNode}) {
     finally { setReady(true); }
   }, []);
   useEffect(() => {
-    void restore(); const expired = () => {setUser(null); setToken(null); router.replace("/login");};
+    void restore(); const expired = () => {setUser(null); setToken(null); if (window.location.pathname !== "/demo") router.replace("/login");};
     window.addEventListener("session-expired", expired);
     const channel = new BroadcastChannel("food-intelligence-auth");
     channel.onmessage = (event) => {if (event.data === "logout") expired();};
@@ -25,10 +25,14 @@ export function SessionProvider({children}: {children: ReactNode}) {
     const result = await api<{accessToken: string}>("/auth/login", {method: "POST", public: true, body: {email,password}});
     setToken(result.accessToken); setUser(await api<User>("/auth/me")); setError(null); router.replace("/");
   };
+  const startDemo = async () => {
+    const result = await api<{accessToken: string}>("/demo/session", {method: "POST", public: true});
+    setToken(result.accessToken); setUser(await api<User>("/auth/me")); setError(null); router.replace("/");
+  };
   const logout = async (all = false) => {
     await api(`/auth/${all ? "logout-all" : "logout"}`, {method: "POST"});
     setToken(null); setUser(null); const channel = new BroadcastChannel("food-intelligence-auth"); channel.postMessage("logout"); channel.close(); router.replace("/login");
   };
-  return <Context.Provider value={{user,ready,error,login,logout,restore}}>{children}</Context.Provider>;
+  return <Context.Provider value={{user,ready,error,login,startDemo,logout,restore}}>{children}</Context.Provider>;
 }
 export function useSession() { const session = useContext(Context); if (!session) throw new Error("Missing session provider"); return session; }

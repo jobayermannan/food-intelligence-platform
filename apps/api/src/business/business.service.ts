@@ -42,13 +42,24 @@ export class BusinessService {
     if (!found) throw new Error("Roles not seeded. Run migrations.");
     return found.id;
   }
+  private async assertNotDemo(userId: string) {
+    const [user] = await this.database.db
+      .select({ isDemo: users.isDemo })
+      .from(users)
+      .where(eq(users.id, userId));
+    if (user?.isDemo)
+      throw new ForbiddenException(
+        "Demo sessions cannot change workspace administration",
+      );
+  }
 
   async create(userId: string, dto: CreateBusinessDto) {
     const [user] = await this.database.db
       .select()
       .from(users)
       .where(eq(users.id, userId));
-    if (!user?.verifiedAt) throw new ForbiddenException();
+    if (!user?.verifiedAt || user.isDemo)
+      throw new ForbiddenException("Demo sessions cannot create businesses");
     try {
       new Intl.DateTimeFormat("en-US", { timeZone: dto.timezone });
     } catch {
@@ -137,6 +148,7 @@ export class BusinessService {
   }
 
   async settings(userId: string, businessId: string, dto: ExpirySettingsDto) {
+    await this.assertNotDemo(userId);
     await this.access.require(userId, businessId, ["OWNER", "ADMIN"]);
     if (dto.warningHours <= dto.criticalHours)
       throw new BadRequestException("Warning must exceed critical");
@@ -157,6 +169,7 @@ export class BusinessService {
     businessId: string,
     dto: CreateLocationDto,
   ) {
+    await this.assertNotDemo(userId);
     await this.access.require(userId, businessId, ["OWNER", "ADMIN"]);
     const [row] = await this.database.db
       .insert(locations)
@@ -170,6 +183,7 @@ export class BusinessService {
     locationId: string,
     dto: UpdateLocationDto,
   ) {
+    await this.assertNotDemo(userId);
     await this.access.require(userId, businessId, ["OWNER", "ADMIN"]);
     const [row] = await this.database.db
       .update(locations)
@@ -221,6 +235,7 @@ export class BusinessService {
       throw new ForbiddenException("Reauthentication failed");
   }
   async addMember(userId: string, businessId: string, dto: MemberDto) {
+    await this.assertNotDemo(userId);
     const scope = await this.access.require(userId, businessId, [
       "OWNER",
       "ADMIN",
@@ -288,6 +303,7 @@ export class BusinessService {
     memberId: string,
     dto: ChangeRoleDto,
   ) {
+    await this.assertNotDemo(userId);
     const scope = await this.access.require(userId, businessId, [
       "OWNER",
       "ADMIN",
@@ -370,6 +386,7 @@ export class BusinessService {
     memberId: string,
     password?: string,
   ) {
+    await this.assertNotDemo(userId);
     const scope = await this.access.require(userId, businessId, [
       "OWNER",
       "ADMIN",
@@ -436,6 +453,7 @@ export class BusinessService {
     memberId: string,
     locationIds: string[],
   ) {
+    await this.assertNotDemo(userId);
     const scope = await this.access.require(userId, businessId, [
       "OWNER",
       "ADMIN",
